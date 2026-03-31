@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matt Wei</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ── Variables ─────────────────────────────────────────── */
+:root{
+  --bg:#fff;--surface:#f5f5f7;--surface2:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--border:#d2d2d7;
+  --accent:#0071e3;--radius:20px;--sidebar-w:76px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);display:flex;-webkit-font-smoothing:antialiased;}
+
+/* ── Sidebar ────────────────────────────────────────────── */
+#sidebar{
+  width:var(--sidebar-w);height:100vh;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;
+  padding:18px 0 20px;gap:4px;position:fixed;left:0;top:0;z-index:200;
+}
+.nav-logo{width:36px;height:36px;background:var(--text);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:#fff;font-family:'Instrument Serif',serif;font-size:19px;}
+.nav-item{width:52px;height:52px;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .18s,transform .12s;gap:3px;position:relative;}
+.nav-item:hover{background:var(--surface);}
+.nav-item:active{transform:scale(.93);}
+.nav-item.active{background:var(--surface);}
+.nav-item svg{width:20px;height:20px;stroke:var(--text-2);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .18s;}
+.nav-lbl{font-size:9px;color:var(--text-2);font-weight:400;transition:color .18s;}
+.nav-item.active svg{stroke:var(--accent);}
+.nav-item.active .nav-lbl{color:var(--accent);font-weight:500;}
+.admin-dot{width:6px;height:6px;background:#30d158;border-radius:50%;position:absolute;bottom:12px;opacity:0;transition:opacity .3s;}
+.admin-mode .admin-dot{opacity:1;}
+
+/* ── Main ───────────────────────────────────────────────── */
+#main{margin-left:var(--sidebar-w);flex:1;height:100vh;overflow:hidden;position:relative;}
+.section{position:absolute;inset:0;overflow-y:auto;padding:52px 72px;opacity:0;transform:translateY(16px);transition:opacity .35s cubic-bezier(.25,.46,.45,.94),transform .35s cubic-bezier(.25,.46,.45,.94);pointer-events:none;}
+.section.active{opacity:1;transform:translateY(0);pointer-events:all;}
+.section::-webkit-scrollbar{width:4px;}
+.section::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* ── Admin: Contenteditable ─────────────────────────────── */
+.admin-mode [contenteditable]{outline:none;border-radius:5px;cursor:text;transition:background .18s,box-shadow .18s;}
+.admin-mode [contenteditable]:hover{background:rgba(0,113,227,.06);}
+.admin-mode [contenteditable]:focus{background:rgba(0,113,227,.06);box-shadow:0 0 0 2px rgba(0,113,227,.25);}
+
+/* ── About ──────────────────────────────────────────────── */
+#about{display:flex;align-items:flex-start;gap:0;}
+.about-left{width:230px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:sticky;top:52px;}
+.photo-frame{width:200px;height:260px;border-radius:20px;background:var(--surface);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.09);position:relative;cursor:default;flex-shrink:0;}
+.admin-mode .photo-frame{cursor:pointer;}
+.photo-frame img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;}
+.photo-frame-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--text-2);font-size:12.5px;text-align:center;padding:20px;}
+.photo-frame-empty svg{width:32px;height:32px;stroke:var(--border);fill:none;stroke-width:1.5;}
+.photo-overlay{position:absolute;inset:0;background:rgba(0,0,0,.38);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity .2s;}
+.admin-mode .photo-frame:hover .photo-overlay{opacity:1;}
+.photo-overlay svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;}
+.photo-overlay span{font-size:11px;color:#fff;}
+
+/* contacts */
+.contact-block{width:100%;padding-top:18px;display:flex;flex-direction:column;gap:11px;}
+.contact-row{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--text-2);position:relative;}
+.contact-row svg{width:14px;height:14px;stroke:var(--text-2);fill:none;stroke-width:1.7;flex-shrink:0;margin-top:1px;stroke-linecap:round;stroke-linejoin:round;}
+.contact-row a{color:var(--accent);text-decoration:none;word-break:break-all;transition:opacity .15s;}
+.contact-row a:hover{opacity:.7;}
+/* edit pencil on contact row */
+.contact-edit-btn{display:none;position:absolute;right:-4px;top:0;width:18px;height:18px;border:none;background:none;cursor:pointer;opacity:.5;transition:opacity .15s;}
+.admin-mode .contact-edit-btn{display:flex;align-items:center;justify-content:center;}
+.contact-edit-btn:hover{opacity:1;}
+.contact-edit-btn svg{width:12px;height:12px;stroke:var(--text-2);fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* right bio */
+.about-right{flex:1;padding:0 0 52px 72px;display:flex;flex-direction:column;}
+.about-name{font-family:'Instrument Serif',serif;font-size:52px;line-height:1.06;margin-bottom:6px;letter-spacing:-.5px;min-width:40px;}
+.about-role{font-size:14px;color:var(--text-2);font-weight:300;margin-bottom:32px;min-width:40px;}
+.about-bio{font-size:16px;line-height:1.8;color:var(--text);font-weight:300;max-width:640px;margin-bottom:36px;min-width:40px;}
+.bio-section{margin-bottom:28px;}
+.bio-section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);margin-bottom:12px;}
+.bio-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
+.bio-chip{padding:5px 14px;background:var(--surface);border-radius:100px;font-size:12.5px;color:var(--text-2);display:flex;align-items:center;gap:5px;}
+.chip-del{display:none;width:14px;height:14px;border:none;background:none;cursor:pointer;color:var(--text-2);font-size:14px;line-height:1;padding:0;flex-shrink:0;opacity:.6;}
+.admin-mode .chip-del{display:block;}
+.chip-del:hover{opacity:1;color:#ff3b30;}
+.chip-add{display:none;padding:5px 12px;background:rgba(0,113,227,.1);border-radius:100px;font-size:12.5px;color:var(--accent);border:1px dashed var(--accent);cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .18s;}
+.admin-mode .chip-add{display:flex;align-items:center;}
+.chip-add:hover{background:rgba(0,113,227,.18);}
+
+/* ── Research cards ─────────────────────────────────────── */
+#research{padding-bottom:0;}
+.page-title{font-family:'Instrument Serif',serif;font-size:48px;line-height:1.08;margin-bottom:5px;letter-spacing:-.4px;}
+.page-sub{font-size:15px;color:var(--text-2);font-weight:300;margin-bottom:38px;}
+.research-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:38px;}
+.research-header .page-title{margin-bottom:0;}
+.add-card-btn{display:none;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .18s;}
+.admin-mode .add-card-btn{display:block;}
+.add-card-btn:hover{background:#0077ed;}
+.scroll-wrap{overflow-x:auto;padding-bottom:28px;scrollbar-width:none;cursor:grab;margin:0 -72px;padding-left:72px;padding-right:72px;}
+.scroll-wrap::-webkit-scrollbar{display:none;}
+.scroll-wrap.grabbing{cursor:grabbing;}
+.cards-row{display:flex;gap:16px;width:max-content;padding:4px 4px 6px;}
+.r-card{width:282px;border-radius:var(--radius);background:var(--surface);overflow:hidden;cursor:pointer;flex-shrink:0;position:relative;transition:transform .3s cubic-bezier(.25,.46,.45,.94),box-shadow .3s cubic-bezier(.25,.46,.45,.94);}
+.r-card:hover{transform:translateY(-6px) scale(1.014);box-shadow:0 24px 56px rgba(0,0,0,.14);}
+
+/* hero: taller, holds optional cover image */
+.r-card-hero{width:100%;height:248px;display:flex;align-items:flex-end;padding:14px;position:relative;overflow:hidden;}
+
+/* cover image — centered 80%, bottom-aligned, rounded top corners */
+.r-card-cover{
+  position:absolute;left:10%;bottom:0;width:80%;
+  border-radius:12px 12px 0 0;
+  overflow:hidden;
+  box-shadow:0 -6px 24px rgba(0,0,0,.22);
+  height:72%;              /* covers lower ~72% of hero */
+  pointer-events:none;
+}
+.r-card-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* color gradients */
+.c-blue{background:linear-gradient(140deg,#0071e3,#34aadc);}
+.c-green{background:linear-gradient(140deg,#30d158,#34c759);}
+.c-orange{background:linear-gradient(140deg,#ff9f0a,#ff6b35);}
+.c-purple{background:linear-gradient(140deg,#bf5af2,#7b61ff);}
+.c-red{background:linear-gradient(140deg,#ff3b30,#ff6961);}
+.c-teal{background:linear-gradient(140deg,#5ac8fa,#32ade6);}
+.c-pink{background:linear-gradient(140deg,#ff2d78,#ff6bac);}
+.c-yellow{background:linear-gradient(140deg,#ffd60a,#ffbe00);}
+.c-indigo{background:linear-gradient(140deg,#5856d6,#3b35c4);}
+.c-mint{background:linear-gradient(140deg,#00c7be,#34aadc);}
+.c-brown{background:linear-gradient(140deg,#a2845e,#8e6b48);}
+.c-slate{background:linear-gradient(140deg,#636e72,#2d3436);}
+
+.hero-badge{position:relative;z-index:2;background:rgba(255,255,255,.22);backdrop-filter:blur(6px);border-radius:9px;padding:7px 9px;display:flex;align-items:center;justify-content:center;}
+.hero-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.r-card-body{padding:18px 20px 22px;}
+.r-card-tag{font-size:9.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.r-card-title{font-family:'Instrument Serif',serif;font-size:22px;line-height:1.15;margin-bottom:8px;}
+.r-card-desc{font-size:12.5px;color:var(--text-2);line-height:1.6;font-weight:300;}
+/* card admin overlay */
+.card-admin-bar{
+  position:absolute;top:8px;right:8px;
+  display:none;gap:5px;
+}
+.admin-mode .card-admin-bar{display:flex;}
+.card-admin-bar button{
+  width:26px;height:26px;border-radius:8px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  backdrop-filter:blur(8px);transition:all .15s;
+}
+.card-edit-btn{background:rgba(255,255,255,.84);}
+.card-edit-btn:hover{background:#fff;}
+.card-del-btn{background:rgba(255,59,48,.85);}
+.card-del-btn:hover{background:#ff3b30;}
+.card-del-btn svg,.card-edit-btn svg{width:12px;height:12px;fill:none;stroke-width:2;stroke-linecap:round;stroke:var(--text);}
+.card-del-btn svg{stroke:#fff;}
+
+/* research modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.48);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .26s;pointer-events:none;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:24px;width:min(680px,92vw);max-height:90vh;overflow-y:auto;transform:translateY(20px) scale(.96);transition:transform .3s cubic-bezier(.25,.46,.45,.94);box-shadow:0 36px 72px rgba(0,0,0,.2);scrollbar-width:none;}
+.modal::-webkit-scrollbar{display:none;}
+.overlay.open .modal{transform:translateY(0) scale(1);}
+.modal-hero{width:100%;height:240px;display:flex;align-items:flex-start;justify-content:flex-end;padding:14px;position:relative;overflow:hidden;}
+/* cover image preview in modal hero */
+.modal-hero-cover{position:absolute;left:10%;bottom:0;width:80%;height:75%;border-radius:14px 14px 0 0;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,.28);}
+.modal-hero-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.modal-close{width:28px;height:28px;background:rgba(255,255,255,.84);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;position:relative;z-index:2;}
+.modal-close:hover{background:#fff;}
+.modal-close svg{width:12px;height:12px;stroke:var(--text);fill:none;stroke-width:2.3;stroke-linecap:round;}
+.modal-body{padding:26px 32px 34px;}
+.modal-body h2{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:5px;letter-spacing:-.2px;}
+.modal-meta{font-size:13px;color:var(--text-2);margin-bottom:20px;}
+.modal-body p{font-size:14.5px;line-height:1.75;color:var(--text);font-weight:300;margin-bottom:12px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;}
+.tag-pill{padding:4px 12px;background:var(--surface);border-radius:100px;font-size:11.5px;color:var(--text-2);}
+
+/* media gallery in modal */
+.modal-media{margin-top:24px;}
+.modal-media-title{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text-2);margin-bottom:12px;}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.media-item{border-radius:12px;overflow:hidden;background:var(--surface);aspect-ratio:16/9;cursor:pointer;position:relative;}
+.media-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;}
+.media-item:hover img{transform:scale(1.04);}
+.media-item video{width:100%;height:100%;object-fit:cover;display:block;}
+.media-play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);}
+.media-play-icon svg{width:32px;height:32px;stroke:#fff;fill:rgba(255,255,255,.2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+/* video embed (iframe) */
+.media-embed{border-radius:12px;overflow:hidden;aspect-ratio:16/9;}
+.media-embed iframe{width:100%;height:100%;border:none;display:block;}
+
+/* ── Form Styles (shared between pub + card editors) ────── */
+.form-modal{width:min(600px,92vw);max-height:88vh;}
+.form-modal .modal-body{padding:28px 32px 36px;}
+.form-modal h3{font-family:'Instrument Serif',serif;font-size:28px;margin-bottom:22px;letter-spacing:-.2px;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:6px;letter-spacing:.02em;}
+.form-hint{font-weight:300;font-size:11px;color:#a0a0a5;}
+.form-input,.form-textarea,.form-select{
+  width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:11px;
+  font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);
+  background:var(--surface);outline:none;transition:border-color .18s,box-shadow .18s;
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,113,227,.12);}
+.form-textarea{resize:vertical;line-height:1.6;min-height:80px;}
+.form-select{cursor:pointer;}
+.form-row{display:flex;gap:12px;}
+.form-row .form-group{flex:1;}
+.link-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.link-row .form-input{flex:1;}
+.link-del-btn{width:30px;height:30px;flex-shrink:0;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text-2);}
+.link-del-btn:hover{background:#ff3b30;border-color:#ff3b30;color:#fff;}
+.link-del-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.add-link-btn{padding:7px 14px;border:1px dashed var(--border);border-radius:9px;background:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--accent);cursor:pointer;transition:all .18s;width:100%;margin-top:2px;}
+.add-link-btn:hover{border-color:var(--accent);background:rgba(0,113,227,.06);}
+.form-section-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2);margin-bottom:10px;margin-top:4px;}
+.color-picker{display:flex;gap:8px;flex-wrap:wrap;}
+.color-opt{width:32px;height:32px;border-radius:9px;cursor:pointer;border:2.5px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0;}
+.color-opt:hover{transform:scale(1.1);}
+.color-opt.selected{border-color:var(--accent);transform:scale(1.1);}
+.form-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--surface);}
+.btn{padding:9px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;border:none;cursor:pointer;transition:all .18s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#0077ed;}
+.btn-secondary{background:var(--surface);color:var(--text);}
+.btn-secondary:hover{background:var(--surface2);}
+.btn-danger{background:#ff3b30;color:#fff;}
+.btn-danger:hover{background:#d63329;}
+
+/* ── Publications ───────────────────────────────────────── */
+.pub-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.pub-header .page-title{margin-bottom:0;}
+.add-pub-btn{display:none;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .18s;}
+.admin-mode .add-pub-btn{display:block;}
+.add-pub-btn:hover{background:#0077ed;}
+.pub-sub{font-size:15px;color:var(--text-2);font-weight:300;margin-bottom:38px;}
+.pub-year{margin-bottom:40px;}
+.pub-year-hd{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--border);}
+.pub-item{padding:20px 0;border-bottom:1px solid var(--surface);display:flex;gap:16px;align-items:flex-start;}
+.pub-item:last-child{border-bottom:none;}
+.pub-item-content{flex:1;}
+.pub-title{font-size:15px;font-weight:500;line-height:1.45;margin-bottom:5px;}
+.pub-authors{font-size:13px;color:var(--text-2);margin-bottom:3px;line-height:1.5;font-weight:300;}
+.pub-authors strong{color:var(--text);font-weight:500;}
+.pub-venue{font-size:12.5px;color:var(--text-2);font-style:italic;margin-bottom:10px;}
+.pub-links{display:flex;gap:6px;flex-wrap:wrap;}
+.pub-link{padding:4px 11px;border:1px solid var(--border);border-radius:7px;font-size:11.5px;color:var(--accent);text-decoration:none;transition:all .18s;}
+.pub-link:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.pub-admin-btns{display:none;flex-direction:column;gap:5px;flex-shrink:0;}
+.admin-mode .pub-admin-btns{display:flex;}
+.pub-icon-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.pub-icon-btn:hover.edit{background:var(--surface2);}
+.pub-icon-btn.del:hover{background:#ff3b30;border-color:#ff3b30;}
+.pub-icon-btn.del:hover svg{stroke:#fff;}
+.pub-icon-btn svg{width:12px;height:12px;stroke:var(--text-2);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ── Travel ─────────────────────────────────────────────── */
+#travel{padding:48px 48px 0;display:flex;flex-direction:column;height:100vh;}
+#travel .page-title{font-size:42px;}
+.travel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.travel-header .page-title{margin-bottom:0;}
+.travel-body{flex:1;display:grid;grid-template-columns:1fr 278px;gap:16px;min-height:0;padding-bottom:24px;}
+.map-wrap{background:var(--surface);border-radius:22px;overflow:hidden;position:relative;min-height:300px;}
+#us-svg{display:block;width:100%;height:100%;}
+.state-path{fill:#dde1ea;stroke:#fff;stroke-width:.6;cursor:pointer;transition:fill .25s;}
+.state-path:hover{filter:brightness(.88);}
+.state-path.selected{fill:var(--accent)!important;filter:none;}
+.map-tooltip{position:absolute;pointer-events:none;background:rgba(29,29,31,.86);backdrop-filter:blur(6px);color:#fff;padding:6px 12px;border-radius:9px;font-size:12px;white-space:nowrap;opacity:0;transition:opacity .15s;z-index:10;line-height:1.5;}
+.map-legend{position:absolute;bottom:14px;left:16px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-radius:10px;padding:8px 12px;}
+.legend-bar{width:80px;height:7px;border-radius:4px;background:linear-gradient(to right,#c8dff8,#003d99);}
+.legend-labels{display:flex;justify-content:space-between;width:80px;font-size:9.5px;color:var(--text-2);margin-top:2px;}
+
+/* travel panel */
+.t-panel{display:flex;flex-direction:column;gap:12px;min-height:0;}
+.upload-zone{background:var(--surface);border-radius:17px;padding:18px;border:1.5px dashed var(--border);cursor:pointer;transition:all .2s;text-align:center;flex-shrink:0;display:none;}
+.admin-mode .upload-zone{display:block;}
+.upload-zone:hover{border-color:var(--accent);background:#f0f6ff;}
+.upload-zone svg{width:24px;height:24px;stroke:var(--text-2);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 8px;}
+.upload-zone p{font-size:12.5px;color:var(--text-2);line-height:1.5;}
+.upload-zone strong{color:var(--accent);font-weight:500;}
+.state-info{flex:1;background:var(--surface);border-radius:17px;overflow:hidden;min-height:0;}
+.state-info-inner{height:100%;overflow-y:auto;scrollbar-width:none;padding:18px;}
+.state-info-inner::-webkit-scrollbar{display:none;}
+.si-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--text-2);font-size:12.5px;text-align:center;padding:24px;font-weight:300;line-height:1.5;}
+.si-empty svg{width:34px;height:34px;stroke:var(--border);fill:none;stroke-width:1.5;stroke-linecap:round;}
+.si-name{font-family:'Instrument Serif',serif;font-size:20px;margin-bottom:2px;}
+.si-count{font-size:11.5px;color:var(--text-2);margin-bottom:12px;font-weight:300;}
+.si-note-wrap{display:none;}
+.admin-mode .si-note-wrap{display:block;}
+.si-note{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--text);background:#fff;resize:none;outline:none;transition:border-color .18s;line-height:1.5;margin-bottom:4px;}
+.si-note:focus{border-color:var(--accent);}
+.si-note-saved{font-size:11px;color:#30d158;height:16px;margin-bottom:6px;}
+.si-note-display{font-size:13px;color:var(--text);line-height:1.6;font-weight:300;margin-bottom:10px;white-space:pre-wrap;display:none;}
+.si-note-display.has-content{display:block;}
+.p-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.p-thumb{aspect-ratio:1;border-radius:11px;overflow:hidden;background:var(--border);position:relative;cursor:pointer;}
+.p-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s;display:block;}
+.p-thumb:hover img{transform:scale(1.06);}
+.del-btn{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(0,0,0,.55);border-radius:50%;border:none;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .18s;cursor:pointer;}
+.admin-mode .del-btn{display:flex;}
+.p-thumb:hover .del-btn{opacity:1;}
+.del-btn svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.si-add-btn{width:100%;padding:9px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .18s;display:none;}
+.admin-mode .si-add-btn{display:block;}
+.si-add-btn:hover{background:#0077ed;}
+
+/* ── Admin Login Modal ──────────────────────────────────── */
+#adminModal{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:900;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .24s;pointer-events:none;}
+#adminModal.open{opacity:1;pointer-events:all;}
+.admin-card{background:#fff;border-radius:22px;padding:32px 34px;width:min(340px,90vw);box-shadow:0 28px 60px rgba(0,0,0,.18);transform:scale(.92) translateY(14px);transition:transform .28s cubic-bezier(.25,.46,.45,.94);}
+#adminModal.open .admin-card{transform:scale(1) translateY(0);}
+.admin-card h3{font-family:'Instrument Serif',serif;font-size:24px;margin-bottom:6px;}
+.admin-card p{font-size:13px;color:var(--text-2);margin-bottom:18px;line-height:1.5;}
+.admin-input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);outline:none;margin-bottom:14px;transition:border-color .18s;letter-spacing:.05em;}
+.admin-input:focus{border-color:var(--accent);}
+.admin-error{font-size:12px;color:#ff3b30;height:16px;margin-bottom:8px;}
+.admin-btn-row{display:flex;gap:8px;justify-content:flex-end;}
+
+/* ── Tag Modal (photo upload) ───────────────────────────── */
+#tagModal{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .24s;pointer-events:none;}
+#tagModal.open{opacity:1;pointer-events:all;}
+.tag-card{background:#fff;border-radius:22px;padding:28px 30px;width:min(360px,92vw);box-shadow:0 28px 56px rgba(0,0,0,.18);transform:scale(.92) translateY(14px);transition:transform .28s cubic-bezier(.25,.46,.45,.94);}
+#tagModal.open .tag-card{transform:scale(1) translateY(0);}
+.tag-card h3{font-family:'Instrument Serif',serif;font-size:24px;margin-bottom:14px;}
+.up-preview{width:100%;height:140px;border-radius:12px;overflow:hidden;background:var(--surface);margin-bottom:12px;}
+.up-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+.up-counter{font-size:11.5px;color:var(--text-2);margin-bottom:4px;}
+.tag-card select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);margin-bottom:14px;outline:none;cursor:pointer;transition:border-color .18s;}
+.tag-card select:focus{border-color:var(--accent);}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;}
+
+/* ── Contact Edit Modal ──────────────────────────────────── */
+#contactModal{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:700;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .24s;pointer-events:none;}
+#contactModal.open{opacity:1;pointer-events:all;}
+.contact-modal-card{background:#fff;border-radius:20px;padding:26px 28px;width:min(340px,90vw);box-shadow:0 24px 56px rgba(0,0,0,.18);transform:scale(.92) translateY(12px);transition:transform .28s cubic-bezier(.25,.46,.45,.94);}
+#contactModal.open .contact-modal-card{transform:scale(1) translateY(0);}
+.contact-modal-card h3{font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:18px;}
+
+/* ── Lightbox ───────────────────────────────────────────── */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .24s;pointer-events:none;}
+#lightbox.open{opacity:1;pointer-events:all;}
+#lightbox img{max-width:90vw;max-height:90vh;border-radius:14px;object-fit:contain;transform:scale(.92);transition:transform .28s cubic-bezier(.25,.46,.45,.94);box-shadow:0 32px 64px rgba(0,0,0,.5);}
+#lightbox.open img{transform:scale(1);}
+.lb-close{position:absolute;top:18px;right:20px;width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s;}
+.lb-close:hover{background:rgba(255,255,255,.28);}
+.lb-close svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.3;stroke-linecap:round;}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media(max-width:960px){
+  :root{--sidebar-w:64px;}
+  .section{padding:40px 40px;}
+  .about-right{padding-left:48px;}
+  .about-left{width:190px;}
+  .photo-frame{width:172px;height:228px;}
+  .about-name{font-size:38px;}
+  #travel{padding:36px 32px 0;}
+  .travel-body{grid-template-columns:1fr 240px;}
+  .page-title{font-size:40px;}
+  .scroll-wrap{margin:0 -40px;padding-left:40px;padding-right:40px;}
+}
+@media(max-width:640px){
+  :root{--sidebar-w:0px;}
+  body{flex-direction:column;}
+  #sidebar{width:100%;height:58px;flex-direction:row;top:auto;bottom:0;left:0;right:0;border-right:none;border-top:1px solid var(--border);padding:0 8px;justify-content:space-around;gap:0;}
+  .nav-logo{display:none;}
+  .admin-dot{bottom:auto;top:6px;right:6px;}
+  .nav-item{width:64px;height:52px;border-radius:10px;}
+  #main{margin-left:0;height:calc(100vh - 58px);}
+  #about{flex-direction:column;padding:24px 20px;}
+  .about-left{width:100%;flex-direction:row;align-items:flex-start;gap:18px;position:static;flex-wrap:wrap;}
+  .photo-frame{width:130px;height:172px;}
+  .contact-block{padding-top:0;flex:1;min-width:160px;}
+  .about-right{padding:20px 0 0;flex:none;width:100%;}
+  .about-name{font-size:30px;}
+  .about-bio{font-size:14px;}
+  #travel{padding:18px 16px 0;height:calc(100vh - 58px);}
+  .travel-body{grid-template-columns:1fr;grid-template-rows:46vw auto;padding-bottom:16px;}
+  .state-info{min-height:200px;}
+  .page-title{font-size:30px;}
+  .page-sub{font-size:13px;margin-bottom:18px;}
+  .scroll-wrap{margin:0 -20px;padding-left:20px;padding-right:20px;}
+  .r-card{width:248px;}
+  #travel .page-title{font-size:26px;}
+  .travel-header{flex-wrap:wrap;gap:8px;}
+}
+@media(max-width:420px){
+  .about-left{flex-direction:column;align-items:center;}
+  .contact-block{width:100%;}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.fi{animation:fadeUp .45s cubic-bezier(.25,.46,.45,.94) both;}
+.fi:nth-child(1){animation-delay:.04s;}.fi:nth-child(2){animation-delay:.10s;}.fi:nth-child(3){animation-delay:.16s;}.fi:nth-child(4){animation-delay:.22s;}.fi:nth-child(5){animation-delay:.28s;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-logo">M</div>
+  <div class="nav-item active" data-sec="about">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <span class="nav-lbl">About</span>
+  </div>
+  <div class="nav-item" data-sec="research">
+    <svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    <span class="nav-lbl">Research</span>
+  </div>
+  <div class="nav-item" data-sec="publications">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="nav-lbl">Papers</span>
+  </div>
+  <div class="nav-item" data-sec="travel">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+    <span class="nav-lbl">Travel</span>
+  </div>
+  <div class="admin-dot" id="adminDot" title="Admin mode · Ctrl+Shift+A to exit"></div>
+</nav>
+
+<main id="main">
+
+<!-- ABOUT -->
+<section id="about" class="section active">
+  <div class="about-left fi">
+    <div class="photo-frame" id="profileFrame" onclick="adminPhotoClick()">
+      <div class="photo-frame-empty" id="profileEmpty">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span>Upload photo</span>
+      </div>
+      <img id="profileImg" src="" alt="Profile" style="display:none">
+      <div class="photo-overlay">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Change photo</span>
+      </div>
+    </div>
+    <input type="file" id="profileUpload" accept="image/*" style="display:none">
+    <div class="contact-block fi" id="contactBlock"></div>
+  </div>
+  <div class="about-right">
+    <h1 class="about-name fi" id="aboutName" spellcheck="false">Matt Wei</h1>
+    <p class="about-role fi" id="aboutRole" spellcheck="false">M.S.E. Mechanical Engineering · Johns Hopkins University</p>
+    <p class="about-bio fi" id="aboutBio" spellcheck="false">I'm a robotics researcher and hardware engineer with a passion for bio-inspired systems, haptic interfaces, and clinically deployable medical robotics. My work spans snake locomotion analysis in the Terradynamics Lab, haptic device development in the Intuitive Computing Lab at JHU, and wearable health monitoring systems. I hold multiple utility patents and have published at IEEE Haptics Symposium 2024. Currently applying for PhD programs in robotics and mechanical intelligence.</p>
+    <div class="bio-section fi">
+      <div class="bio-section-label">Research Interests</div>
+      <div class="bio-chips" id="interestChips"></div>
+    </div>
+    <div class="bio-section fi">
+      <div class="bio-section-label">Education</div>
+      <div class="bio-chips" id="educationChips"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section id="research" class="section">
+  <div class="research-header">
+    <div>
+      <h1 class="page-title fi">Research</h1>
+      <p class="page-sub fi" style="margin-bottom:0">Drag to explore · Click a card for details</p>
+    </div>
+    <button class="add-card-btn fi" onclick="openCardModal()">+ Add Project</button>
+  </div>
+  <div class="scroll-wrap fi" id="scrollWrap" style="margin-top:38px">
+    <div class="cards-row" id="cardsRow"></div>
+  </div>
+</section>
+
+<!-- PUBLICATIONS -->
+<section id="publications" class="section">
+  <div class="pub-header fi">
+    <div>
+      <h1 class="page-title">Publications</h1>
+    </div>
+    <button class="add-pub-btn" onclick="openPubModal()">+ Add Publication</button>
+  </div>
+  <p class="pub-sub fi">Peer-reviewed papers &amp; conference proceedings</p>
+  <div id="pubList"></div>
+</section>
+
+<!-- TRAVEL -->
+<section id="travel" class="section">
+  <div class="travel-header">
+    <h1 class="page-title">Travel</h1>
+    <span style="font-size:12.5px;color:var(--text-2);font-weight:300" id="travelHint">Click a state · more photos = deeper blue</span>
+  </div>
+  <div class="travel-body">
+    <div class="map-wrap" id="mapWrap">
+      <svg id="us-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="map-tooltip" id="mapTip"></div>
+      <div class="map-legend"><div><div class="legend-bar"></div><div class="legend-labels"><span>fewer</span><span>more</span></div></div></div>
+    </div>
+    <div class="t-panel">
+      <div class="upload-zone" id="uploadZone">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p><strong>Upload photos</strong><br>Tag them to any state</p>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+      <div class="state-info">
+        <div class="state-info-inner">
+          <div class="si-empty" id="siEmpty">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Click any state to explore travel photos &amp; notes</span>
+          </div>
+          <div id="siContent" style="display:none">
+            <div class="si-name" id="siName"></div>
+            <div class="si-count" id="siCount"></div>
+            <div class="si-note-display" id="siNoteDisplay"></div>
+            <div class="si-note-wrap">
+              <textarea class="si-note" id="siNote" rows="3" placeholder="Add travel notes…"></textarea>
+              <div class="si-note-saved" id="siNoteSaved"></div>
+            </div>
+            <div class="p-grid" id="pGrid"></div>
+            <button class="si-add-btn" id="siAddBtn">+ Add Photos</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- RESEARCH VIEW MODAL -->
+<div class="overlay" id="rModal">
+  <div class="modal">
+    <div class="modal-hero" id="mHero">
+      <div class="modal-hero-cover" id="mCover" style="display:none"><img id="mCoverImg" src="" alt=""></div>
+      <button class="modal-close" id="mClose">
+        <svg viewBox="0 0 14 14"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h2 id="mTitle"></h2><p class="modal-meta" id="mMeta"></p>
+      <div id="mContent"></div>
+      <div class="modal-media" id="mMedia" style="display:none">
+        <div class="modal-media-title">Media</div>
+        <div class="media-grid" id="mMediaGrid"></div>
+      </div>
+      <div class="tags" id="mTags"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESEARCH CARD EDITOR MODAL -->
+<div class="overlay" id="cardModal">
+  <div class="modal form-modal">
+    <div class="modal-body">
+      <h3 id="cardModalTitle">Add Research Project</h3>
+
+      <div class="form-group">
+        <label>Color Theme</label>
+        <div class="color-picker" id="cardColorPicker">
+          <div class="color-opt c-blue selected"   data-color="c-blue"   onclick="selectColor(this)" title="Blue"></div>
+          <div class="color-opt c-green"            data-color="c-green"  onclick="selectColor(this)" title="Green"></div>
+          <div class="color-opt c-orange"           data-color="c-orange" onclick="selectColor(this)" title="Orange"></div>
+          <div class="color-opt c-purple"           data-color="c-purple" onclick="selectColor(this)" title="Purple"></div>
+          <div class="color-opt c-red"              data-color="c-red"    onclick="selectColor(this)" title="Red"></div>
+          <div class="color-opt c-teal"             data-color="c-teal"   onclick="selectColor(this)" title="Teal"></div>
+          <div class="color-opt c-pink"             data-color="c-pink"   onclick="selectColor(this)" title="Pink"></div>
+          <div class="color-opt c-yellow"           data-color="c-yellow" onclick="selectColor(this)" title="Yellow"></div>
+          <div class="color-opt c-indigo"           data-color="c-indigo" onclick="selectColor(this)" title="Indigo"></div>
+          <div class="color-opt c-mint"             data-color="c-mint"   onclick="selectColor(this)" title="Mint"></div>
+          <div class="color-opt c-brown"            data-color="c-brown"  onclick="selectColor(this)" title="Brown"></div>
+          <div class="color-opt c-slate"            data-color="c-slate"  onclick="selectColor(this)" title="Slate"></div>
+        </div>
+      </div>
+
+      <!-- Cover Image -->
+      <div class="form-group">
+        <label>Cover Image <span class="form-hint">shown floating in the card's colored banner (optional)</span></label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div id="coverPreviewWrap" style="width:120px;height:72px;border-radius:10px;overflow:hidden;background:var(--surface);flex-shrink:0;display:none">
+            <img id="coverPreviewImg" src="" style="width:100%;height:100%;object-fit:cover;display:block">
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+            <button class="add-link-btn" style="margin-top:0" onclick="document.getElementById('coverFileInput').click()">📷 Upload cover image</button>
+            <button class="add-link-btn" id="removeCoverBtn" style="margin-top:0;display:none;color:#ff3b30;border-color:#ff3b30" onclick="removeCoverImage()">✕ Remove cover image</button>
+          </div>
+        </div>
+        <input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="handleCoverUpload(this)">
+        <input type="hidden" id="cardCoverImg" value="">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category Tag <span class="form-hint">e.g. Haptics · HRI</span></label>
+          <input class="form-input" id="cardTag" placeholder="Category · Subcategory">
+        </div>
+        <div class="form-group" style="flex:none;width:130px">
+          <label>Year / Lab</label>
+          <input class="form-input" id="cardYear" placeholder="2024">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Project Title</label>
+        <input class="form-input" id="cardTitle" placeholder="HapKnob">
+      </div>
+
+      <div class="form-group">
+        <label>Short Description <span class="form-hint">shown on card</span></label>
+        <textarea class="form-textarea" id="cardDesc" rows="2" placeholder="One-sentence summary for the card preview."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Meta Line <span class="form-hint">lab, conference, institution</span></label>
+        <input class="form-input" id="cardMeta" placeholder="Intuitive Computing Lab · JHU · IEEE Haptics Symposium 2024">
+      </div>
+
+      <div class="form-group">
+        <label>Full Description <span class="form-hint">separate paragraphs with a blank line</span></label>
+        <textarea class="form-textarea" id="cardBody" rows="5" placeholder="Full project description…&#10;&#10;Second paragraph…"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Tags <span class="form-hint">comma-separated</span></label>
+        <input class="form-input" id="cardTags" placeholder="Haptics, Force Feedback, Mechatronics">
+      </div>
+
+      <!-- Media: images + videos -->
+      <div class="form-group">
+        <div class="form-section-title">Media Gallery <span class="form-hint" style="text-transform:none;letter-spacing:0">(images &amp; videos shown in detail view)</span></div>
+        <div id="cardMediaList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px">
+          <button class="add-link-btn" style="margin-top:0;flex:1" onclick="document.getElementById('mediaFileInput').click()">🖼 Upload images</button>
+          <button class="add-link-btn" style="margin-top:0;flex:1" onclick="addVideoRow()">🎬 Add video URL</button>
+        </div>
+        <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple style="display:none" onchange="handleMediaUpload(this)">
+      </div>
+
+      <input type="hidden" id="cardEditId" value="">
+      <div class="form-footer">
+        <button class="btn btn-danger" id="cardDeleteBtn" style="display:none" onclick="deleteCard()">Delete</button>
+        <button class="btn btn-secondary" onclick="closeCardModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCard()">Save Project</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLICATION EDITOR MODAL -->
+<div class="overlay" id="pubModal">
+  <div class="modal form-modal">
+    <div class="modal-body">
+      <h3 id="pubModalTitle">Add Publication</h3>
+
+      <div class="form-group">
+        <label>Paper Title *</label>
+        <textarea class="form-textarea" id="pmTitle" rows="2" placeholder="Full title of your paper"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Authors <span class="form-hint">comma-separated, in citation order</span></label>
+        <input class="form-input" id="pmAuthors" placeholder="Zitong Wei, Author Two, Author Three, et al.">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Your Name <span class="form-hint">exact match → bold</span></label>
+          <input class="form-input" id="pmSelf" placeholder="Zitong Wei">
+        </div>
+        <div class="form-group" style="flex:none;width:110px">
+          <label>Year *</label>
+          <input class="form-input" id="pmYear" type="number" placeholder="2024" min="1900" max="2100">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Venue / Journal / Conference *</label>
+        <input class="form-input" id="pmVenue" placeholder="IEEE Haptics Symposium 2024">
+      </div>
+
+      <div class="form-group">
+        <div class="form-section-title">Links</div>
+        <div id="pmLinksContainer"></div>
+        <button class="add-link-btn" onclick="addPubLinkRow()">+ Add Link (PDF, DOI, Code, Slides…)</button>
+      </div>
+
+      <input type="hidden" id="pmEditId" value="">
+      <div class="form-footer">
+        <button class="btn btn-danger" id="pubDeleteBtn" style="display:none" onclick="deletePub()">Delete</button>
+        <button class="btn btn-secondary" onclick="closePubModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="savePub()">Save Publication</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="adminModal">
+  <div class="admin-card">
+    <h3>Admin Login</h3>
+    <p>Press <strong>Ctrl+Shift+A</strong> anytime to open this.<br>Enter password to edit content.</p>
+    <input type="password" class="admin-input" id="adminPwInput" placeholder="Password">
+    <div class="admin-error" id="adminError"></div>
+    <div class="admin-btn-row">
+      <button class="btn btn-secondary" id="adminCancel">Cancel</button>
+      <button class="btn btn-primary" id="adminConfirm">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT EDIT MODAL -->
+<div id="contactModal">
+  <div class="contact-modal-card">
+    <h3>Edit Contact</h3>
+    <div class="form-group"><label>Label / Display Text</label><input class="form-input" id="cLabel" placeholder="matt@example.com"></div>
+    <div class="form-group"><label>URL / href <span class="form-hint">leave blank if plain text</span></label><input class="form-input" id="cHref" placeholder="mailto:matt@example.com or https://…"></div>
+    <input type="hidden" id="cIndex">
+    <div class="form-footer">
+      <button class="btn btn-secondary" onclick="closeContactModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveContact()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAG MODAL -->
+<div id="tagModal">
+  <div class="tag-card">
+    <h3>Tag this photo</h3>
+    <div class="up-preview"><img id="upImg" src="" alt=""></div>
+    <div class="up-counter" id="upCounter"></div>
+    <select id="stateSel"></select>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="cancelTag">Cancel</button>
+      <button class="btn btn-primary" id="confirmTag">Add to Map ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button class="lb-close" id="lbClose">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+/* ================================================================
+   PASSWORD CONFIG
+   Change ADMIN_HASH to your own password hash.
+   How to generate:
+     1. Open browser console (F12) on this page
+     2. Run:  await hashPw('your_password')
+     3. Copy the result and replace the string below
+   Currently set to: "mattwei2024"
+   ================================================================ */
+const ADMIN_HASH = 'ea5bceb25c50eb15958214f93ed2a88822c3f3799c8784665e5743064dcc1568';
+async function hashPw(pw){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+
+/* ================================================================
+   APP STATE (loaded from localStorage)
+   ================================================================ */
+const LS_KEY = 'mattwei_site_v1';
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(STATE)); }
+
+let STATE = Object.assign({
+  about: {
+    name: 'Matt Wei',
+    role: 'M.S.E. Mechanical Engineering · Johns Hopkins University',
+    bio: "I'm a robotics researcher and hardware engineer with a passion for bio-inspired systems, haptic interfaces, and clinically deployable medical robotics. My work spans snake locomotion analysis in the Terradynamics Lab, haptic device development in the Intuitive Computing Lab at JHU, and wearable health monitoring systems. I hold multiple utility patents and have published at IEEE Haptics Symposium 2024. Currently applying for PhD programs in robotics and mechanical intelligence.",
+    photo: null,
+    interests: ['Bio-inspired Robotics','Haptic Interfaces','Medical Robotics','Soft Robotics','Wearable Systems','Embedded Systems'],
+    education: ['M.S.E. Mechanical Engineering · Johns Hopkins University','B.Eng. · Nanjing Institute of Technology'],
+    contacts: [
+      {icon:'mail', label:'matt@example.com', href:'mailto:matt@example.com'},
+      {icon:'github', label:'github.com/mattwei', href:'https://github.com/'},
+      {icon:'linkedin', label:'linkedin.com/in/mattwei', href:'https://linkedin.com/in/'},
+      {icon:'location', label:'Baltimore, MD · Nanjing, China', href:''},
+      {icon:'scholar', label:'Google Scholar', href:'https://scholar.google.com/'}
+    ]
+  },
+  research: [
+    {id:1,color:'c-blue',tag:'Haptics · HRI',title:'HapKnob',desc:'Variable-stiffness haptic interface with programmable force feedback through a rotary knob paradigm.',meta:'Intuitive Computing Lab · JHU · IEEE Haptics Symposium 2024',body:`HapKnob is a novel haptic interface designed to deliver rich, programmable force feedback through a familiar rotary knob form factor. The system combines variable-stiffness actuation with high-resolution torque sensing to create a versatile haptic device suitable for applications ranging from teleoperation to medical simulation.\n\nThe device enables rendering of complex haptic textures, detents, and stiffness profiles with sub-millisecond latency. We demonstrated the system at IEEE Haptics Symposium 2024, receiving strong feedback on its intuitive form factor and expressive feedback bandwidth.`,tags:['Haptics','HRI','Mechatronics','Torque Control','Force Feedback','IEEE 2024']},
+    {id:2,color:'c-green',tag:'Wearables · Embedded',title:'BalanX-D',desc:'Multi-sensor health monitoring wearable on ESP32/NimBLE with HR, SpO2, GSR and IMU fusion.',meta:'Independent Project · ESP32 / ESP-IDF · NimBLE BLE Stack',body:`BalanX-D is a microcontroller-based multi-sensor health monitoring platform built on ESP32 using the ESP-IDF framework. The system integrates MAX30102 (heart rate / SpO2), GSR sensors, and IMU data, transmitting structured binary packets over Bluetooth Low Energy using the NimBLE stack.\n\nKey engineering challenges included optimizing BLE advertising packet size within the 31-byte constraint, designing a structured binary sensor packet (sensor_pkt_t), and achieving reliable multi-sensor fusion with low latency.`,tags:['ESP32','BLE / NimBLE','Embedded C','Wearables','IoT','Signal Processing']},
+    {id:3,color:'c-orange',tag:'Bio-inspired Robotics',title:'Snake Locomotion',desc:'Biomechanical analysis of limbless locomotion using DeepLabCut pose estimation across substrates.',meta:'Terradynamics Lab · Johns Hopkins University',body:`In the Terradynamics Lab at JHU, I contributed to research analyzing the locomotor strategies of limbless vertebrates including snakes and ropefish. Using DeepLabCut for markerless pose estimation, we extracted high-resolution kinematic data from video recordings across diverse substrates.\n\nThe project investigates how body-terrain interaction forces scale with gait parameters, contributing to bio-inspired locomotion for snake-like robotic platforms.`,tags:['Bio-inspired','DeepLabCut','Kinematics','Python','Computer Vision','Terradynamics']},
+    {id:4,color:'c-purple',tag:'Medical Robotics',title:'Surgical Navigation',desc:'Magnetic actuation and steering control for flexible surgical catheters in minimally invasive procedures.',meta:'Research Presentation · Prof. Sarthak Misra · University of Twente',body:`This project explores external magnetic fields to actuate and steer flexible surgical catheters for minimally invasive procedures, enabling precise navigation through complex anatomical pathways without mechanical linkages.\n\nI prepared a comprehensive research presentation for Prof. Sarthak Misra's Surgical Robotics Lab at the University of Twente, covering magnetic actuation principles, catheter design, real-time control architectures, and clinical translation challenges.`,tags:['Medical Robotics','Magnetic Actuation','Catheters','MIS','Control Systems','Soft Robotics']},
+    {id:5,color:'c-red',tag:'Mechatronics',title:'Wheel-Track Robot',desc:'Hybrid locomotion robot with articulated arms combining wheel-track drivetrain for unstructured terrain.',meta:'Undergraduate Capstone · Nanjing Institute of Technology',body:`This undergraduate capstone project involved the design and fabrication of a multi-arm hybrid locomotion robot for unstructured terrain. The platform integrates a wheel-track drivetrain with articulated arms that enable step climbing and obstacle traversal.\n\nMechanical design was implemented in SolidWorks with FEA validation, while the control system used PLC-based architecture with custom ladder logic.`,tags:['Mechatronics','Hybrid Locomotion','PLC','SolidWorks','FEA','Capstone']},
+    {id:6,color:'c-teal',tag:'AGI · Hardware',title:'AGI Alarm System',desc:'Patent-pending AGI-integrated alarm clock with hardware-tied architecture for context-aware wake routines.',meta:'Independent Project · Utility Patent Application Filed',body:`This project introduces a novel alarm clock system architecturally integrated with AGI capabilities at the hardware level. Unlike software-layer AI assistants, the system ties AI inference directly to hardware wake controllers, enabling context-aware adaptive alarm behavior.\n\nA utility patent application has been filed covering the core architectural innovations.`,tags:['AGI Integration','Patent','Embedded Systems','Hardware Architecture','IoT']}
+  ],
+  pubs: [
+    {id:1,title:'HapKnob: A Variable-Stiffness Haptic Knob Interface for Programmable Force Feedback',authors:'Zitong Wei, et al.',self:'Zitong Wei',year:2024,venue:'IEEE Haptics Symposium 2024',links:[{label:'PDF',url:'#'},{label:'DOI',url:'#'},{label:'Slides',url:'#'}]}
+  ],
+  travel: {}
+}, loadState());
+
+let nextId = Math.max(
+  ...STATE.research.map(r=>r.id), 
+  ...STATE.pubs.map(p=>p.id), 
+  0
+) + 1;
+
+/* ================================================================
+   ADMIN
+   ================================================================ */
+let isAdmin = false;
+
+function setAdmin(val){
+  isAdmin = val;
+  document.body.classList.toggle('admin-mode', val);
+  // toggle contenteditable
+  ['aboutName','aboutRole','aboutBio'].forEach(id=>{
+    document.getElementById(id).contentEditable = val ? 'true' : 'false';
+  });
+}
+
+// Ctrl/Cmd + Shift + A
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='A'){
+    e.preventDefault();
+    isAdmin ? setAdmin(false) : openAdminModal();
+  }
+  if(e.key==='Escape') closeAll();
+});
+
+function openAdminModal(){
+  document.getElementById('adminPwInput').value='';
+  document.getElementById('adminError').textContent='';
+  document.getElementById('adminModal').classList.add('open');
+  setTimeout(()=>document.getElementById('adminPwInput').focus(),80);
+}
+document.getElementById('adminCancel').onclick=()=>document.getElementById('adminModal').classList.remove('open');
+document.getElementById('adminPwInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('adminConfirm').click();});
+document.getElementById('adminConfirm').onclick = async()=>{
+  const pw = document.getElementById('adminPwInput').value;
+  const hash = await hashPw(pw);
+  // DEV: accept any password — replace `true ||` with just the hash check when deploying
+  if(hash===ADMIN_HASH){
+    document.getElementById('adminModal').classList.remove('open');
+    setAdmin(true);
+  } else {
+    document.getElementById('adminError').textContent='Incorrect password.';
+    document.getElementById('adminPwInput').value='';
+    document.getElementById('adminPwInput').focus();
+  }
+};
+
+/* ================================================================
+   NAV
+   ================================================================ */
+let mapInited = false;
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>{
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===n));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===n.dataset.sec));
+  if(n.dataset.sec==='travel'&&!mapInited){setTimeout(initMap,120);mapInited=true;}
+}));
+
+/* ================================================================
+   ABOUT — RENDER + EDITING
+   ================================================================ */
+const ICONS = {
+  mail: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6',
+  github: 'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22',
+  linkedin: 'M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2',
+  location: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3',
+  scholar: 'M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z'
+};
+
+function renderContacts(){
+  const cb = document.getElementById('contactBlock');
+  cb.innerHTML = STATE.about.contacts.map((c,i)=>`
+    <div class="contact-row">
+      <svg viewBox="0 0 24 24"><path d="${ICONS[c.icon]||ICONS.mail}"/></svg>
+      ${c.href ? `<a href="${c.href}" target="${c.href.startsWith('mailto')?'_self':'_blank'}">${c.label}</a>` : `<span>${c.label}</span>`}
+      <button class="contact-edit-btn" onclick="openContactModal(${i})" title="Edit">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+function renderChips(containerId, arr, key){
+  const el = document.getElementById(containerId);
+  el.innerHTML = arr.map((v,i)=>`
+    <span class="bio-chip">
+      ${v}
+      <button class="chip-del" onclick="deleteChip('${key}',${i})" title="Remove">×</button>
+    </span>`).join('') +
+    `<button class="chip-add" onclick="addChip('${key}')">+ Add</button>`;
+}
+
+function deleteChip(key, idx){
+  STATE.about[key].splice(idx,1); saveState();
+  renderChips(key==='interests'?'interestChips':'educationChips', STATE.about[key], key);
+}
+function addChip(key){
+  const val = prompt(`Add new ${key==='interests'?'interest':'education'} entry:`);
+  if(val && val.trim()){
+    STATE.about[key].push(val.trim()); saveState();
+    renderChips(key==='interests'?'interestChips':'educationChips', STATE.about[key], key);
+  }
+}
+
+function initAbout(){
+  document.getElementById('aboutName').textContent = STATE.about.name;
+  document.getElementById('aboutRole').textContent = STATE.about.role;
+  document.getElementById('aboutBio').textContent = STATE.about.bio;
+  if(STATE.about.photo){
+    document.getElementById('profileImg').src = STATE.about.photo;
+    document.getElementById('profileImg').style.display='block';
+    document.getElementById('profileEmpty').style.display='none';
+  }
+  renderContacts();
+  renderChips('interestChips', STATE.about.interests, 'interests');
+  renderChips('educationChips', STATE.about.education, 'education');
+}
+initAbout();
+
+// auto-save contenteditable
+['aboutName','aboutRole','aboutBio'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('blur',()=>{
+    const key={aboutName:'name',aboutRole:'role',aboutBio:'bio'}[id];
+    STATE.about[key]=el.textContent.trim();
+    saveState();
+  });
+});
+
+// photo upload
+document.getElementById('profileUpload').addEventListener('change',function(){
+  if(!this.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    STATE.about.photo=e.target.result; saveState();
+    document.getElementById('profileImg').src=e.target.result;
+    document.getElementById('profileImg').style.display='block';
+    document.getElementById('profileEmpty').style.display='none';
+  };
+  r.readAsDataURL(this.files[0]);
+});
+function adminPhotoClick(){ if(isAdmin) document.getElementById('profileUpload').click(); }
+
+/* ================================================================
+   CONTACT EDITOR
+   ================================================================ */
+function openContactModal(idx){
+  const c=STATE.about.contacts[idx];
+  document.getElementById('cLabel').value=c.label;
+  document.getElementById('cHref').value=c.href||'';
+  document.getElementById('cIndex').value=idx;
+  document.getElementById('contactModal').classList.add('open');
+  setTimeout(()=>document.getElementById('cLabel').focus(),80);
+}
+function closeContactModal(){ document.getElementById('contactModal').classList.remove('open'); }
+function saveContact(){
+  const idx=+document.getElementById('cIndex').value;
+  STATE.about.contacts[idx].label=document.getElementById('cLabel').value.trim();
+  STATE.about.contacts[idx].href=document.getElementById('cHref').value.trim();
+  saveState(); renderContacts(); closeContactModal();
+}
+
+/* ================================================================
+   RESEARCH CARDS
+   ================================================================ */
+function renderCards(){
+  const row=document.getElementById('cardsRow');
+  row.innerHTML='';
+  STATE.research.forEach(r=>{
+    const coverHtml = r.coverImg
+      ? `<div class="r-card-cover"><img src="${r.coverImg}" alt="cover"></div>` : '';
+    const c=document.createElement('div');c.className='r-card';
+    c.innerHTML=`
+      <div class="r-card-hero ${r.color}">
+        ${coverHtml}
+        <div class="hero-badge" style="position:relative;z-index:2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg></div>
+      </div>
+      <div class="r-card-body">
+        <div class="r-card-tag">${r.tag}</div>
+        <div class="r-card-title">${r.title}</div>
+        <div class="r-card-desc">${r.desc}</div>
+      </div>
+      <div class="card-admin-bar">
+        <button class="card-edit-btn" onclick="event.stopPropagation();openCardModal(${r.id})" title="Edit">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="card-del-btn" onclick="event.stopPropagation();deleteCard(${r.id})" title="Delete">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+    c.addEventListener('click',()=>openRModal(r));
+    row.appendChild(c);
+  });
+}
+renderCards();
+
+// drag scroll
+const sw=document.getElementById('scrollWrap');
+let dg=false,sx,sl;
+sw.addEventListener('mousedown',e=>{dg=true;sx=e.pageX-sw.offsetLeft;sl=sw.scrollLeft;sw.classList.add('grabbing');});
+window.addEventListener('mouseup',()=>{dg=false;sw.classList.remove('grabbing');});
+sw.addEventListener('mousemove',e=>{if(!dg)return;e.preventDefault();sw.scrollLeft=sl-(e.pageX-sw.offsetLeft-sx)*1.3;});
+
+// view modal
+const rModal=document.getElementById('rModal');
+document.getElementById('mClose').onclick=()=>rModal.classList.remove('open');
+rModal.addEventListener('click',e=>{if(e.target===rModal)rModal.classList.remove('open');});
+function openRModal(r){
+  document.getElementById('mHero').className=`modal-hero ${r.color}`;
+  // cover image in modal hero
+  const mCover=document.getElementById('mCover');
+  const mCoverImg=document.getElementById('mCoverImg');
+  if(r.coverImg){mCover.style.display='block';mCoverImg.src=r.coverImg;}
+  else{mCover.style.display='none';mCoverImg.src='';}
+  document.getElementById('mTitle').textContent=r.title;
+  document.getElementById('mMeta').textContent=r.meta;
+  document.getElementById('mContent').innerHTML=(r.body||'').split('\n\n').map(p=>`<p>${p.trim()}</p>`).join('');
+  // media gallery
+  const media=r.media||[];
+  const mMedia=document.getElementById('mMedia');
+  const mGrid=document.getElementById('mMediaGrid');
+  if(media.length){
+    mMedia.style.display='block';
+    mGrid.innerHTML=media.map(m=>{
+      if(m.type==='image'){
+        return `<div class="media-item" onclick="openLightbox('${encodeURIComponent(m.src)}')">
+          <img src="${m.src}" alt="media">
+        </div>`;
+      } else if(m.type==='video-file'){
+        return `<div class="media-item">
+          <video src="${m.src}" controls preload="metadata" style="width:100%;height:100%;object-fit:cover"></video>
+        </div>`;
+      } else if(m.type==='video-url'){
+        // YouTube / Vimeo embed
+        const embedSrc=toEmbedUrl(m.src);
+        return embedSrc
+          ? `<div class="media-embed"><iframe src="${embedSrc}" allowfullscreen loading="lazy"></iframe></div>`
+          : `<div class="media-item" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-2);padding:12px;text-align:center">
+              <a href="${m.src}" target="_blank" style="color:var(--accent)">${m.src}</a>
+            </div>`;
+      }
+      return '';
+    }).join('');
+  } else { mMedia.style.display='none'; }
+  document.getElementById('mTags').innerHTML=(r.tags||[]).map(t=>`<span class="tag-pill">${t}</span>`).join('');
+  rModal.classList.add('open');
+}
+
+function toEmbedUrl(url){
+  // YouTube
+  const yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if(yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  // Vimeo
+  const vm=url.match(/vimeo\.com\/(\d+)/);
+  if(vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  return null;
+}
+
+// card editor
+let selectedColor='c-blue';
+function selectColor(el){
+  document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor=el.dataset.color;
+}
+
+function openCardModal(id=null){
+  const editing=id?STATE.research.find(r=>r.id===id):null;
+  document.getElementById('cardModalTitle').textContent=editing?'Edit Research Project':'Add Research Project';
+  document.getElementById('cardDeleteBtn').style.display=editing?'block':'none';
+  document.getElementById('cardEditId').value=id||'';
+  // reset cover
+  document.getElementById('cardCoverImg').value='';
+  document.getElementById('coverPreviewWrap').style.display='none';
+  document.getElementById('removeCoverBtn').style.display='none';
+  // reset media list
+  document.getElementById('cardMediaList').innerHTML='';
+  if(editing){
+    selectedColor=editing.color;
+    document.querySelectorAll('.color-opt').forEach(x=>{x.classList.toggle('selected',x.dataset.color===editing.color);});
+    document.getElementById('cardTag').value=editing.tag;
+    document.getElementById('cardYear').value=editing.year||'';
+    document.getElementById('cardTitle').value=editing.title;
+    document.getElementById('cardDesc').value=editing.desc;
+    document.getElementById('cardMeta').value=editing.meta||'';
+    document.getElementById('cardBody').value=editing.body||'';
+    document.getElementById('cardTags').value=(editing.tags||[]).join(', ');
+    // cover
+    if(editing.coverImg){
+      document.getElementById('cardCoverImg').value=editing.coverImg;
+      document.getElementById('coverPreviewImg').src=editing.coverImg;
+      document.getElementById('coverPreviewWrap').style.display='block';
+      document.getElementById('removeCoverBtn').style.display='block';
+    }
+    // media
+    (editing.media||[]).forEach(m=>addMediaRow(m));
+  } else {
+    document.getElementById('cardTag').value='';
+    document.getElementById('cardYear').value='';
+    document.getElementById('cardTitle').value='';
+    document.getElementById('cardDesc').value='';
+    document.getElementById('cardMeta').value='';
+    document.getElementById('cardBody').value='';
+    document.getElementById('cardTags').value='';
+    selectedColor='c-blue';
+    document.querySelectorAll('.color-opt').forEach((x,i)=>x.classList.toggle('selected',i===0));
+  }
+  document.getElementById('cardModal').classList.add('open');
+  setTimeout(()=>document.getElementById('cardTitle').focus(),80);
+}
+function closeCardModal(){ document.getElementById('cardModal').classList.remove('open'); }
+function saveCard(){
+  const editId=document.getElementById('cardEditId').value;
+  // collect media from list
+  const mediaItems=[];
+  document.querySelectorAll('#cardMediaList .media-row-item').forEach(row=>{
+    const type=row.dataset.type;
+    const src=row.dataset.src;
+    if(src) mediaItems.push({type,src});
+  });
+  const card={
+    id: editId?+editId:nextId++,
+    color: selectedColor,
+    tag: document.getElementById('cardTag').value.trim()||'Research',
+    title: document.getElementById('cardTitle').value.trim()||'Untitled',
+    desc: document.getElementById('cardDesc').value.trim(),
+    meta: document.getElementById('cardMeta').value.trim(),
+    body: document.getElementById('cardBody').value.trim(),
+    tags: document.getElementById('cardTags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    coverImg: document.getElementById('cardCoverImg').value||null,
+    media: mediaItems
+  };
+  if(editId){
+    const idx=STATE.research.findIndex(r=>r.id===+editId);
+    if(idx>=0) STATE.research[idx]=card;
+  } else {
+    STATE.research.push(card);
+  }
+  saveState(); renderCards(); closeCardModal();
+}
+
+/* ── Cover image helpers ─────────── */
+function handleCoverUpload(input){
+  if(!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    document.getElementById('cardCoverImg').value=e.target.result;
+    document.getElementById('coverPreviewImg').src=e.target.result;
+    document.getElementById('coverPreviewWrap').style.display='block';
+    document.getElementById('removeCoverBtn').style.display='block';
+  };
+  r.readAsDataURL(input.files[0]);
+  input.value='';
+}
+function removeCoverImage(){
+  document.getElementById('cardCoverImg').value='';
+  document.getElementById('coverPreviewImg').src='';
+  document.getElementById('coverPreviewWrap').style.display='none';
+  document.getElementById('removeCoverBtn').style.display='none';
+}
+
+/* ── Media helpers ───────────────── */
+function handleMediaUpload(input){
+  Array.from(input.files).forEach(file=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const type=file.type.startsWith('video')?'video-file':'image';
+      addMediaRow({type,src:e.target.result});
+    };
+    r.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function addVideoRow(src=''){
+  const url=src||prompt('Paste YouTube, Vimeo, or direct video URL:');
+  if(!url||!url.trim())return;
+  addMediaRow({type:'video-url',src:url.trim()});
+}
+
+function addMediaRow(m){
+  const list=document.getElementById('cardMediaList');
+  const row=document.createElement('div');
+  row.className='media-row-item';
+  row.dataset.type=m.type;
+  row.dataset.src=m.src;
+  row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border-radius:10px;';
+  const icon=m.type==='image'?'🖼':m.type==='video-file'?'🎞':'🎬';
+  const label=m.type==='image'?'Image'
+    :m.type==='video-file'?'Video file'
+    :`Video: ${m.src.length>40?m.src.slice(0,40)+'…':m.src}`;
+  const thumb=m.type==='image'
+    ?`<img src="${m.src}" style="width:48px;height:32px;object-fit:cover;border-radius:6px;flex-shrink:0">`
+    :`<div style="width:48px;height:32px;border-radius:6px;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${icon}</div>`;
+  row.innerHTML=`
+    ${thumb}
+    <span style="flex:1;font-size:12.5px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${label}</span>
+    <button onclick="this.parentElement.remove()" style="width:24px;height:24px;border:none;background:none;cursor:pointer;color:#ff3b30;font-size:16px;flex-shrink:0;border-radius:6px;display:flex;align-items:center;justify-content:center">×</button>`;
+  list.appendChild(row);
+}
+function deleteCard(id){
+  if(!id) id=+document.getElementById('cardEditId').value;
+  if(!confirm('Delete this research project?')) return;
+  STATE.research=STATE.research.filter(r=>r.id!==id);
+  saveState(); renderCards(); closeCardModal();
+}
+
+/* ================================================================
+   PUBLICATIONS
+   ================================================================ */
+function renderPubs(){
+  const container=document.getElementById('pubList');
+  container.innerHTML='';
+  // group by year desc
+  const byYear={};
+  STATE.pubs.forEach(p=>{(byYear[p.year]||(byYear[p.year]=[])).push(p);});
+  Object.keys(byYear).sort((a,b)=>b-a).forEach(year=>{
+    const grp=document.createElement('div');grp.className='pub-year';
+    grp.innerHTML=`<div class="pub-year-hd">${year}</div>`;
+    byYear[year].forEach(p=>{
+      const auth=p.authors.split(',').map(a=>{
+        const t=a.trim();
+        return t===p.self?`<strong>${t}</strong>`:t;
+      }).join(', ');
+      const links=(p.links||[]).map(l=>`<a class="pub-link" href="${l.url}" target="_blank">${l.label}</a>`).join('');
+      grp.innerHTML+=`
+        <div class="pub-item">
+          <div class="pub-item-content">
+            <div class="pub-title">${p.title}</div>
+            <div class="pub-authors">${auth}</div>
+            <div class="pub-venue">${p.venue}</div>
+            ${links?`<div class="pub-links">${links}</div>`:''}
+          </div>
+          <div class="pub-admin-btns">
+            <button class="pub-icon-btn edit" onclick="openPubModal(${p.id})" title="Edit">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="pub-icon-btn del" onclick="deletePub(${p.id})" title="Delete">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            </button>
+          </div>
+        </div>`;
+    });
+    container.appendChild(grp);
+  });
+}
+renderPubs();
+
+// pub link rows
+function addPubLinkRow(label='',url=''){
+  const c=document.getElementById('pmLinksContainer');
+  const row=document.createElement('div');row.className='link-row';
+  row.innerHTML=`
+    <input class="form-input" placeholder="Label (PDF, DOI, Code…)" value="${label}" style="width:130px;flex:none">
+    <input class="form-input" placeholder="https://…" value="${url}">
+    <button class="link-del-btn" onclick="this.parentElement.remove()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>`;
+  c.appendChild(row);
+}
+
+function openPubModal(id=null){
+  const editing=id?STATE.pubs.find(p=>p.id===id):null;
+  document.getElementById('pubModalTitle').textContent=editing?'Edit Publication':'Add Publication';
+  document.getElementById('pubDeleteBtn').style.display=editing?'block':'none';
+  document.getElementById('pmEditId').value=id||'';
+  document.getElementById('pmLinksContainer').innerHTML='';
+  if(editing){
+    document.getElementById('pmTitle').value=editing.title;
+    document.getElementById('pmAuthors').value=editing.authors;
+    document.getElementById('pmSelf').value=editing.self||'';
+    document.getElementById('pmYear').value=editing.year;
+    document.getElementById('pmVenue').value=editing.venue;
+    (editing.links||[]).forEach(l=>addPubLinkRow(l.label,l.url));
+  } else {
+    document.getElementById('pmTitle').value='';
+    document.getElementById('pmAuthors').value='';
+    document.getElementById('pmSelf').value='Zitong Wei';
+    document.getElementById('pmYear').value=new Date().getFullYear();
+    document.getElementById('pmVenue').value='';
+  }
+  document.getElementById('pubModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pmTitle').focus(),80);
+}
+function closePubModal(){ document.getElementById('pubModal').classList.remove('open'); }
+function savePub(){
+  const title=document.getElementById('pmTitle').value.trim();
+  const year=+document.getElementById('pmYear').value;
+  const venue=document.getElementById('pmVenue').value.trim();
+  if(!title||!year||!venue){ alert('Title, Year and Venue are required.'); return; }
+
+  const links=[];
+  document.querySelectorAll('#pmLinksContainer .link-row').forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const lbl=inputs[0].value.trim(), url=inputs[1].value.trim();
+    if(lbl&&url) links.push({label:lbl,url});
+  });
+
+  const editId=document.getElementById('pmEditId').value;
+  const pub={
+    id: editId?+editId:nextId++,
+    title, year,
+    authors: document.getElementById('pmAuthors').value.trim()||'Author et al.',
+    self: document.getElementById('pmSelf').value.trim(),
+    venue, links
+  };
+  if(editId){
+    const idx=STATE.pubs.findIndex(p=>p.id===+editId);
+    if(idx>=0) STATE.pubs[idx]=pub;
+  } else {
+    STATE.pubs.push(pub);
+  }
+  saveState(); renderPubs(); closePubModal();
+}
+function deletePub(id){
+  if(!id) id=+document.getElementById('pmEditId').value;
+  if(!confirm('Delete this publication?')) return;
+  STATE.pubs=STATE.pubs.filter(p=>p.id!==id);
+  saveState(); renderPubs(); closePubModal();
+}
+
+/* ================================================================
+   TRAVEL MAP
+   ================================================================ */
+const US_STATES=['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming','Washington D.C.'];
+const FIPS={'01':'Alabama','02':'Alaska','04':'Arizona','05':'Arkansas','06':'California','08':'Colorado','09':'Connecticut','10':'Delaware','11':'Washington D.C.','12':'Florida','13':'Georgia','15':'Hawaii','16':'Idaho','17':'Illinois','18':'Indiana','19':'Iowa','20':'Kansas','21':'Kentucky','22':'Louisiana','23':'Maine','24':'Maryland','25':'Massachusetts','26':'Michigan','27':'Minnesota','28':'Mississippi','29':'Missouri','30':'Montana','31':'Nebraska','32':'Nevada','33':'New Hampshire','34':'New Jersey','35':'New Mexico','36':'New York','37':'North Carolina','38':'North Dakota','39':'Ohio','40':'Oklahoma','41':'Oregon','42':'Pennsylvania','44':'Rhode Island','45':'South Carolina','46':'South Dakota','47':'Tennessee','48':'Texas','49':'Utah','50':'Vermont','51':'Virginia','53':'Washington','54':'West Virginia','55':'Wisconsin','56':'Wyoming'};
+
+const ss=document.getElementById('stateSel');
+US_STATES.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+
+const colorScale=(cnt)=>{
+  if(!cnt) return '#dde1ea';
+  const stops=[[1,[200,223,248]],[3,[120,180,240]],[6,[60,140,230]],[10,[0,75,185]]];
+  let c=stops[stops.length-1][1];
+  for(let i=0;i<stops.length-1;i++){
+    const [lo,clo]=stops[i],hi=stops[i+1][0],chi=stops[i+1][1];
+    if(cnt<=hi){const t=(cnt-lo)/(hi-lo);c=clo.map((v,j)=>Math.round(v+(chi[j]-v)*t));break;}
+  }
+  return `rgb(${c.join(',')})`;
+};
+
+let selectedState=null;
+
+function refreshMapColors(){
+  d3.selectAll('path.state-path').each(function(){
+    const name=FIPS[d3.select(this).attr('data-fips')]||'';
+    if(!d3.select(this).classed('selected'))
+      d3.select(this).style('fill',colorScale((STATE.travel[name]?.photos||[]).length));
+  });
+}
+
+function initMap(){
+  const wrap=document.getElementById('mapWrap');
+  let W=wrap.clientWidth||700,H=wrap.clientHeight||460;
+  const svg=d3.select('#us-svg').attr('viewBox',`0 0 ${W} ${H}`).attr('preserveAspectRatio','xMidYMid meet');
+  const proj=d3.geoAlbersUsa().translate([W/2,H/2]).scale(Math.min(W,H)*1.28);
+  const path=d3.geoPath().projection(proj);
+  const tip=document.getElementById('mapTip');
+
+  fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+    .then(r=>r.json()).then(us=>{
+      svg.selectAll('path').data(topojson.feature(us,us.objects.states).features).join('path')
+        .attr('class','state-path').attr('d',path)
+        .attr('data-fips',d=>String(d.id).padStart(2,'0'))
+        .style('fill','#dde1ea')
+        .on('mousemove',function(ev,d){
+          const name=FIPS[String(d.id).padStart(2,'0')]||'';
+          const cnt=(STATE.travel[name]?.photos||[]).length;
+          tip.style.opacity='1';
+          tip.style.left=(ev.offsetX+14)+'px';
+          tip.style.top=(ev.offsetY-18)+'px';
+          tip.innerHTML=cnt?`<strong>${name}</strong><br>${cnt} photo${cnt>1?'s':''}`:`<strong>${name||'?'}</strong>`;
+        })
+        .on('mouseleave',()=>tip.style.opacity='0')
+        .on('click',function(ev,d){
+          const name=FIPS[String(d.id).padStart(2,'0')]||'';if(!name)return;
+          svg.selectAll('path.state-path').classed('selected',false);
+          refreshMapColors();
+          d3.select(this).classed('selected',true).style('fill','var(--accent)');
+          openStatePanel(name);
+        });
+      refreshMapColors();
+      new ResizeObserver(()=>{
+        W=wrap.clientWidth;H=wrap.clientHeight;
+        svg.attr('viewBox',`0 0 ${W} ${H}`);
+        proj.translate([W/2,H/2]).scale(Math.min(W,H)*1.28);
+        svg.selectAll('path').attr('d',path);
+      }).observe(wrap);
+    })
+    .catch(()=>{ document.getElementById('mapWrap').innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-2);font-size:13px;padding:24px;text-align:center">Map requires internet connection.</div>'; });
+}
+
+function openStatePanel(name){
+  selectedState=name;
+  if(!STATE.travel[name]) STATE.travel[name]={photos:[],note:''};
+  document.getElementById('siEmpty').style.display='none';
+  document.getElementById('siContent').style.display='block';
+  document.getElementById('siName').textContent=name;
+  document.getElementById('siNote').value=STATE.travel[name].note||'';
+  document.getElementById('siNoteSaved').textContent='';
+  const nd=document.getElementById('siNoteDisplay');
+  nd.textContent=STATE.travel[name].note||'';
+  nd.className='si-note-display'+(STATE.travel[name].note?' has-content':'');
+  renderTravelGrid();
+}
+
+function renderTravelGrid(){
+  const photos=STATE.travel[selectedState]?.photos||[];
+  document.getElementById('siCount').textContent=photos.length?`${photos.length} photo${photos.length>1?'s':''} · Visited ✓`:'No photos yet';
+  document.getElementById('pGrid').innerHTML=photos.map((p,i)=>`
+    <div class="p-thumb" onclick="openLightbox('${encodeURIComponent(p)}')">
+      <img src="${p}" alt="">
+      <button class="del-btn" onclick="event.stopPropagation();delTravelPhoto(${i})">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`).join('');
+  refreshMapColors();
+}
+
+function delTravelPhoto(idx){ if(!isAdmin)return; STATE.travel[selectedState].photos.splice(idx,1); saveState(); renderTravelGrid(); }
+
+let nt;
+document.getElementById('siNote').addEventListener('input',function(){
+  clearTimeout(nt);
+  nt=setTimeout(()=>{
+    if(selectedState&&isAdmin){
+      STATE.travel[selectedState].note=this.value; saveState();
+      const nd=document.getElementById('siNoteDisplay');
+      nd.textContent=this.value; nd.className='si-note-display'+(this.value?' has-content':'');
+      const el=document.getElementById('siNoteSaved');
+      el.textContent='✓ Saved'; setTimeout(()=>el.textContent='',2000);
+    }
+  },800);
+});
+document.getElementById('siAddBtn').addEventListener('click',()=>{ if(selectedState&&isAdmin){ss.value=selectedState;document.getElementById('fileInput').click();} });
+
+/* ================================================================
+   UPLOAD FLOW
+   ================================================================ */
+let pFiles=[],pIdx=0,pUrl=null;
+document.getElementById('uploadZone').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('uploadZone').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('uploadZone').style.borderColor='var(--accent)';});
+document.getElementById('uploadZone').addEventListener('dragleave',()=>document.getElementById('uploadZone').style.borderColor='');
+document.getElementById('uploadZone').addEventListener('drop',e=>{e.preventDefault();document.getElementById('uploadZone').style.borderColor='';startUp(e.dataTransfer.files);});
+document.getElementById('fileInput').addEventListener('change',function(){if(isAdmin)startUp(this.files);});
+
+function startUp(files){pFiles=Array.from(files);pIdx=0;if(pFiles.length)nextTag();}
+function nextTag(){
+  if(pIdx>=pFiles.length){document.getElementById('fileInput').value='';return;}
+  const r=new FileReader();
+  r.onload=e=>{
+    pUrl=e.target.result;
+    document.getElementById('upImg').src=pUrl;
+    document.getElementById('upCounter').textContent=pFiles.length>1?`Photo ${pIdx+1} of ${pFiles.length}`:'';
+    if(selectedState)ss.value=selectedState;
+    document.getElementById('tagModal').classList.add('open');
+  };
+  r.readAsDataURL(pFiles[pIdx]);
+}
+document.getElementById('cancelTag').addEventListener('click',()=>{document.getElementById('tagModal').classList.remove('open');pFiles=[];document.getElementById('fileInput').value='';});
+document.getElementById('confirmTag').addEventListener('click',()=>{
+  if(!isAdmin)return;
+  const name=ss.value;
+  if(!STATE.travel[name])STATE.travel[name]={photos:[],note:''};
+  STATE.travel[name].photos.push(pUrl); saveState();
+  document.getElementById('tagModal').classList.remove('open');
+  d3.selectAll('path.state-path').classed('selected',false); refreshMapColors();
+  d3.selectAll('path.state-path').filter(function(){return FIPS[d3.select(this).attr('data-fips')]===name;}).classed('selected',true).style('fill','var(--accent)');
+  openStatePanel(name);
+  pIdx++; if(pIdx<pFiles.length)setTimeout(nextTag,300); else document.getElementById('fileInput').value='';
+});
+
+/* ================================================================
+   LIGHTBOX
+   ================================================================ */
+const lb=document.getElementById('lightbox');
+document.getElementById('lbClose').onclick=()=>lb.classList.remove('open');
+lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('open');});
+function openLightbox(enc){document.getElementById('lbImg').src=decodeURIComponent(enc);lb.classList.add('open');}
+
+/* ================================================================
+   CLOSE ALL
+   ================================================================ */
+function closeAll(){
+  ['rModal','cardModal','pubModal','tagModal','adminModal','contactModal','lightbox'].forEach(id=>{
+    document.getElementById(id).classList.remove('open');
+  });
+}
+
+// close overlay modals on backdrop click
+['cardModal','pubModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');});
+});
+</script>
+</body>
+</html>
