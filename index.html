@@ -392,6 +392,95 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 .fi{animation:fadeUp .45s cubic-bezier(.25,.46,.45,.94) both;}
 .fi:nth-child(1){animation-delay:.04s;}.fi:nth-child(2){animation-delay:.10s;}.fi:nth-child(3){animation-delay:.16s;}.fi:nth-child(4){animation-delay:.22s;}.fi:nth-child(5){animation-delay:.28s;}
+
+/* ── Featured Research Card ──────────────────────────────── */
+.featured-wrap{margin-bottom:28px;}
+.featured-label{
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-2);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.featured-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.feat-card{
+  display:flex;border-radius:22px;background:var(--surface);
+  overflow:hidden;cursor:pointer;position:relative;
+  transition:transform .3s cubic-bezier(.25,.46,.45,.94),box-shadow .3s cubic-bezier(.25,.46,.45,.94);
+  min-height:200px;
+}
+.feat-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.13);}
+.feat-hero{
+  width:320px;flex-shrink:0;position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;padding:16px;
+}
+.feat-cover{position:absolute;left:8%;bottom:0;width:84%;height:72%;border-radius:12px 12px 0 0;overflow:hidden;box-shadow:0 -4px 20px rgba(0,0,0,.22);}
+.feat-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.feat-badge{position:relative;z-index:2;background:rgba(255,255,255,.22);backdrop-filter:blur(6px);border-radius:9px;padding:7px 9px;display:flex;align-items:center;justify-content:center;}
+.feat-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.feat-body{flex:1;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;}
+.feat-new-badge{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:100px;margin-bottom:10px;width:fit-content;
+}
+.feat-tag{font-size:9.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.feat-title{font-family:'Instrument Serif',serif;font-size:28px;line-height:1.12;margin-bottom:10px;letter-spacing:-.2px;}
+.feat-desc{font-size:13.5px;color:var(--text-2);line-height:1.6;font-weight:300;max-width:480px;margin-bottom:14px;}
+.feat-meta{font-size:12px;color:var(--text-2);font-weight:300;}
+.feat-admin-bar{position:absolute;top:10px;right:10px;display:none;gap:5px;}
+.admin-mode .feat-admin-bar{display:flex;}
+.feat-empty{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100px;background:var(--surface);border-radius:18px;
+  border:1.5px dashed var(--border);font-size:13px;color:var(--text-2);
+}
+.admin-mode .feat-empty{cursor:pointer;}
+.admin-mode .feat-empty:hover{border-color:var(--accent);background:#f0f6ff;color:var(--accent);}
+
+/* ── Recent Activity ─────────────────────────────────────── */
+.activity-section{margin-top:32px;}
+.activity-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.activity-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);}
+.add-activity-btn{
+  display:none;padding:3px 10px;background:rgba(0,113,227,.1);border:1px dashed var(--accent);
+  border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11.5px;color:var(--accent);
+  cursor:pointer;transition:all .18s;
+}
+.admin-mode .add-activity-btn{display:block;}
+.add-activity-btn:hover{background:rgba(0,113,227,.18);}
+.activity-list{display:flex;flex-direction:column;gap:8px;}
+.activity-item{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:14px;line-height:1.55;color:var(--text);font-weight:300;
+  padding:10px 14px;background:var(--surface);border-radius:12px;
+  border-left:3px solid var(--accent);
+}
+.activity-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;margin-top:8px;}
+.activity-text{flex:1;}
+.activity-del{
+  display:none;width:20px;height:20px;border:none;background:none;
+  cursor:pointer;color:#ff3b30;font-size:16px;flex-shrink:0;
+  border-radius:5px;align-items:center;justify-content:center;opacity:.6;
+}
+.admin-mode .activity-del{display:flex;}
+.activity-del:hover{opacity:1;}
+.activity-empty{
+  font-size:13px;color:var(--text-2);font-weight:300;
+  padding:12px 14px;background:var(--surface);border-radius:12px;
+  border:1.5px dashed var(--border);text-align:center;
+  display:none;
+}
+.admin-mode .activity-empty{display:block;}
+
+/* ── Batch Upload Modal ──────────────────────────────────── */
+#batchModal{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .24s;pointer-events:none;}
+#batchModal.open{opacity:1;pointer-events:all;}
+.batch-card{background:#fff;border-radius:22px;padding:28px 30px;width:min(360px,92vw);box-shadow:0 28px 56px rgba(0,0,0,.18);transform:scale(.92) translateY(14px);transition:transform .28s cubic-bezier(.25,.46,.45,.94);}
+#batchModal.open .batch-card{transform:scale(1) translateY(0);}
+.batch-card h3{font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:6px;}
+.batch-card p{font-size:13px;color:var(--text-2);margin-bottom:14px;line-height:1.5;}
+.batch-preview{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;max-height:100px;overflow:hidden;}
+.batch-thumb{width:54px;height:40px;border-radius:7px;overflow:hidden;background:var(--surface);flex-shrink:0;}
+.batch-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.batch-card select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);margin-bottom:14px;outline:none;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -449,6 +538,15 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
       <div class="bio-section-label">Education</div>
       <div class="bio-chips" id="educationChips"></div>
     </div>
+    <!-- Recent Activity -->
+    <div class="activity-section fi">
+      <div class="activity-header">
+        <span class="activity-label">Recent Activity</span>
+        <button class="add-activity-btn" onclick="addActivity()">+ Add Update</button>
+      </div>
+      <div class="activity-list" id="activityList"></div>
+      <div class="activity-empty" id="activityEmpty">Click "+ Add Update" to post your latest news</div>
+    </div>
   </div>
 </section>
 
@@ -461,8 +559,17 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
     </div>
     <button class="add-card-btn fi" onclick="openCardModal()">+ Add Project</button>
   </div>
-  <div class="scroll-wrap fi" id="scrollWrap" style="margin-top:38px">
-    <div class="cards-row" id="cardsRow"></div>
+  <!-- Featured (latest) card -->
+  <div class="featured-wrap fi" id="featuredWrap" style="margin-top:28px">
+    <div class="featured-label">Latest Project</div>
+    <div id="featuredCard"></div>
+  </div>
+  <!-- All other cards row -->
+  <div id="otherCardsWrap" style="display:none">
+    <div class="featured-label fi">All Projects</div>
+    <div class="scroll-wrap fi" id="scrollWrap">
+      <div class="cards-row" id="cardsRow"></div>
+    </div>
   </div>
 </section>
 
@@ -729,6 +836,20 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
   </div>
 </div>
 
+<!-- BATCH UPLOAD MODAL -->
+<div id="batchModal">
+  <div class="batch-card">
+    <h3>Upload Photos</h3>
+    <p id="batchDesc">Select a state to tag all photos</p>
+    <div class="batch-preview" id="batchPreview"></div>
+    <select id="batchStateSel"></select>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="cancelBatch">Cancel</button>
+      <button class="btn btn-primary" id="confirmBatch">Upload All ✓</button>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div id="lightbox">
   <button class="lb-close" id="lbClose">
@@ -788,18 +909,18 @@ function loadLocalState(){
 }
 // saveState: persist to BOTH localStorage (instant) AND Firestore (cloud)
 async function saveState(){
-  // local cache — instant
   localStorage.setItem(LS_KEY, JSON.stringify({
     about: STATE.about,
     research: STATE.research,
-    pubs: STATE.pubs
+    pubs: STATE.pubs,
+    activity: STATE.activity
   }));
-  // cloud — text data only (photos stored in Storage, URLs in STATE)
   try{
     await db.collection('site').doc('config').set({
       about: STATE.about,
       research: STATE.research,
       pubs: STATE.pubs,
+      activity: STATE.activity||[],
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch(e){ console.warn('Firestore save failed:',e); }
@@ -871,7 +992,12 @@ let STATE = Object.assign({
   pubs: [
     {id:1,title:'HapKnob: A Variable-Stiffness Haptic Knob Interface for Programmable Force Feedback',authors:'Zitong Wei, et al.',self:'Zitong Wei',year:2024,venue:'IEEE Haptics Symposium 2024',links:[{label:'PDF',url:'#'},{label:'DOI',url:'#'},{label:'Slides',url:'#'}]}
   ],
-  travel: {}
+  travel: {},
+  activity: [
+    'Started Ph.D. at Rochester Institute of Technology — Fall 2025',
+    'Published HapKnob at IEEE Haptics Symposium 2024',
+    'Completed M.S.E. in Mechanical Engineering at Johns Hopkins University'
+  ]
 }, loadLocalState());
 
 let nextId = Math.max(...STATE.research.map(r=>r.id), ...STATE.pubs.map(p=>p.id), 0) + 1;
@@ -886,6 +1012,7 @@ async function loadFromFirestore(){
       if(d.about) STATE.about=d.about;
       if(d.research) STATE.research=d.research;
       if(d.pubs) STATE.pubs=d.pubs;
+      if(d.activity) STATE.activity=d.activity;
       nextId = Math.max(...STATE.research.map(r=>r.id),...STATE.pubs.map(p=>p.id),0)+1;
     }
     // travel data
@@ -895,6 +1022,7 @@ async function loadFromFirestore(){
     initAbout();
     renderCards();
     renderPubs();
+    renderActivity();
     if(mapInited) refreshMapColors();
   } catch(e){ console.warn('Firestore load failed, using local cache:',e); }
 }
@@ -1016,6 +1144,34 @@ function initAbout(){
 }
 initAbout();
 
+initAbout();
+
+/* ── Recent Activity ─────────────────────────────────────── */
+function renderActivity(){
+  if(!STATE.activity) STATE.activity=[];
+  const list=document.getElementById('activityList');
+  const empty=document.getElementById('activityEmpty');
+  list.innerHTML=STATE.activity.map((item,i)=>`
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div class="activity-text">${item}</div>
+      <button class="activity-del" onclick="deleteActivity(${i})" title="Remove">×</button>
+    </div>`).join('');
+  empty.style.display=STATE.activity.length?'none':'block';
+}
+renderActivity();
+
+function addActivity(){
+  const val=prompt('Add a new activity update:');
+  if(!val||!val.trim())return;
+  STATE.activity.unshift(val.trim());
+  saveState(); renderActivity();
+}
+function deleteActivity(idx){
+  STATE.activity.splice(idx,1);
+  saveState(); renderActivity();
+}
+
 // auto-save contenteditable
 ['aboutName','aboutRole','aboutBio'].forEach(id=>{
   const el=document.getElementById(id);
@@ -1065,33 +1221,78 @@ function saveContact(){
    RESEARCH CARDS
    ================================================================ */
 function renderCards(){
-  const row=document.getElementById('cardsRow');
-  row.innerHTML='';
-  STATE.research.forEach(r=>{
-    const coverHtml = r.coverImg
-      ? `<div class="r-card-cover"><img src="${r.coverImg}" alt="cover"></div>` : '';
-    const c=document.createElement('div');c.className='r-card';
-    c.innerHTML=`
-      <div class="r-card-hero ${r.color}">
-        ${coverHtml}
-        <div class="hero-badge" style="position:relative;z-index:2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg></div>
-      </div>
-      <div class="r-card-body">
-        <div class="r-card-tag">${r.tag}</div>
-        <div class="r-card-title">${r.title}</div>
-        <div class="r-card-desc">${r.desc}</div>
-      </div>
-      <div class="card-admin-bar">
-        <button class="card-edit-btn" onclick="event.stopPropagation();openCardModal(${r.id})" title="Edit">
-          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="card-del-btn" onclick="event.stopPropagation();deleteCard(${r.id})" title="Delete">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+  const featured = STATE.research[0] || null;
+  const others   = STATE.research.slice(1);
+
+  // ── Featured card ─────────────────────────────────────────
+  const fc = document.getElementById('featuredCard');
+  if(featured){
+    const coverHtml = featured.coverImg
+      ? `<div class="feat-cover"><img src="${featured.coverImg}" alt="cover"></div>` : '';
+    fc.innerHTML=`
+      <div class="feat-card">
+        <div class="feat-hero ${featured.color}">
+          ${coverHtml}
+          <div class="feat-badge" style="position:relative;z-index:2">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>
+          </div>
+        </div>
+        <div class="feat-body">
+          <span class="feat-new-badge">✦ Latest</span>
+          <div class="feat-tag">${featured.tag}</div>
+          <div class="feat-title">${featured.title}</div>
+          <div class="feat-desc">${featured.desc}</div>
+          <div class="feat-meta">${featured.meta||''}</div>
+        </div>
+        <div class="feat-admin-bar card-admin-bar" style="display:none">
+          <button class="card-edit-btn" onclick="event.stopPropagation();openCardModal(${featured.id})" title="Edit">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="card-del-btn" onclick="event.stopPropagation();deleteCard(${featured.id})" title="Delete">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
       </div>`;
-    c.addEventListener('click',()=>openRModal(r));
-    row.appendChild(c);
-  });
+    fc.querySelector('.feat-card').addEventListener('click', ()=>openRModal(featured));
+    if(isAdmin) fc.querySelector('.feat-admin-bar').style.display='flex';
+  } else {
+    fc.innerHTML=`<div class="feat-empty" onclick="isAdmin&&openCardModal()">+ Add your first research project</div>`;
+  }
+
+  // ── Other cards row ────────────────────────────────────────
+  const otherWrap = document.getElementById('otherCardsWrap');
+  const row = document.getElementById('cardsRow');
+  row.innerHTML='';
+  if(others.length){
+    otherWrap.style.display='block';
+    others.forEach(r=>{
+      const coverHtml = r.coverImg
+        ? `<div class="r-card-cover"><img src="${r.coverImg}" alt="cover"></div>` : '';
+      const c=document.createElement('div');c.className='r-card';
+      c.innerHTML=`
+        <div class="r-card-hero ${r.color}">
+          ${coverHtml}
+          <div class="hero-badge" style="position:relative;z-index:2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg></div>
+        </div>
+        <div class="r-card-body">
+          <div class="r-card-tag">${r.tag}</div>
+          <div class="r-card-title">${r.title}</div>
+          <div class="r-card-desc">${r.desc}</div>
+        </div>
+        <div class="card-admin-bar">
+          <button class="card-edit-btn" onclick="event.stopPropagation();openCardModal(${r.id})" title="Edit">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="card-del-btn" onclick="event.stopPropagation();deleteCard(${r.id})" title="Delete">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>`;
+      c.addEventListener('click',()=>openRModal(r));
+      row.appendChild(c);
+    });
+  } else {
+    otherWrap.style.display='none';
+  }
 }
 renderCards();
 
@@ -1235,7 +1436,7 @@ function saveCard(){
     const idx=STATE.research.findIndex(r=>r.id===+editId);
     if(idx>=0) STATE.research[idx]=card;
   } else {
-    STATE.research.push(card);
+    STATE.research.unshift(card); // new cards go to FRONT → become featured
   }
   saveState(); renderCards(); closeCardModal();
 }
@@ -1442,7 +1643,14 @@ US_STATES.forEach(s=>{const o=document.createElement('option');o.value=s;o.textC
 
 const colorScale=(cnt)=>{
   if(!cnt) return '#dde1ea';
-  const stops=[[1,[200,223,248]],[3,[120,180,240]],[6,[60,140,230]],[10,[0,75,185]]];
+  // much more pronounced: 1 photo=very light, 10+ = deep navy
+  const stops=[
+    [1, [210,230,252]],
+    [2, [150,195,245]],
+    [4, [80, 148,230]],
+    [7, [20,  90,210]],
+    [12,[0,   45,150]]
+  ];
   let c=stops[stops.length-1][1];
   for(let i=0;i<stops.length-1;i++){
     const [lo,clo]=stops[i],hi=stops[i+1][0],chi=stops[i+1][1];
@@ -1548,43 +1756,62 @@ document.getElementById('siNote').addEventListener('input',function(){
 document.getElementById('siAddBtn').addEventListener('click',()=>{ if(selectedState&&isAdmin){ss.value=selectedState;document.getElementById('fileInput').click();} });
 
 /* ================================================================
-   UPLOAD FLOW
+   BATCH TRAVEL UPLOAD (all photos → one state at once)
    ================================================================ */
-let pFiles=[],pIdx=0,pUrl=null;
+let batchFiles=[];
+// populate batch state select
+const bss=document.getElementById('batchStateSel');
+US_STATES.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;bss.appendChild(o);});
+
 document.getElementById('uploadZone').addEventListener('click',()=>document.getElementById('fileInput').click());
 document.getElementById('uploadZone').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('uploadZone').style.borderColor='var(--accent)';});
 document.getElementById('uploadZone').addEventListener('dragleave',()=>document.getElementById('uploadZone').style.borderColor='');
-document.getElementById('uploadZone').addEventListener('drop',e=>{e.preventDefault();document.getElementById('uploadZone').style.borderColor='';startUp(e.dataTransfer.files);});
-document.getElementById('fileInput').addEventListener('change',function(){if(isAdmin)startUp(this.files);});
+document.getElementById('uploadZone').addEventListener('drop',e=>{e.preventDefault();document.getElementById('uploadZone').style.borderColor='';startBatch(e.dataTransfer.files);});
+document.getElementById('fileInput').addEventListener('change',function(){if(isAdmin)startBatch(this.files);});
+document.getElementById('siAddBtn').addEventListener('click',()=>{if(selectedState&&isAdmin)document.getElementById('fileInput').click();});
 
-function startUp(files){pFiles=Array.from(files);pIdx=0;if(pFiles.length)nextTag();}
-function nextTag(){
-  if(pIdx>=pFiles.length){document.getElementById('fileInput').value='';return;}
-  // show preview using object URL (no upload yet — upload on confirm)
-  const objectUrl=URL.createObjectURL(pFiles[pIdx]);
-  document.getElementById('upImg').src=objectUrl;
-  document.getElementById('upCounter').textContent=pFiles.length>1?`Photo ${pIdx+1} of ${pFiles.length}`:'';
-  if(selectedState)ss.value=selectedState;
-  document.getElementById('tagModal').classList.add('open');
+function startBatch(files){
+  if(!files.length)return;
+  batchFiles=Array.from(files);
+  // show previews
+  const preview=document.getElementById('batchPreview');
+  preview.innerHTML=batchFiles.slice(0,8).map(f=>`
+    <div class="batch-thumb"><img src="${URL.createObjectURL(f)}" alt=""></div>`).join('');
+  document.getElementById('batchDesc').textContent=
+    `${batchFiles.length} photo${batchFiles.length>1?'s':''} selected — choose a state to tag them all`;
+  if(selectedState) bss.value=selectedState;
+  document.getElementById('batchModal').classList.add('open');
 }
-document.getElementById('cancelTag').addEventListener('click',()=>{document.getElementById('tagModal').classList.remove('open');pFiles=[];document.getElementById('fileInput').value='';});
-document.getElementById('confirmTag').addEventListener('click',async()=>{
-  if(!isAdmin)return;
-  const name=ss.value;
-  document.getElementById('tagModal').classList.remove('open');
-  const file=pFiles[pIdx];
-  try{
-    const compressed=await compressImage(file,1400,0.85);
-    const safeName=name.replace(/\s+/g,'_');
-    const url=await uploadFile(compressed,`travel/${safeName}/photo_${Date.now()}.jpg`);
-    if(!STATE.travel[name])STATE.travel[name]={photos:[],note:''};
-    STATE.travel[name].photos.push(url);
-    await saveTravelState(name);
-    d3.selectAll('path.state-path').classed('selected',false); refreshMapColors();
-    d3.selectAll('path.state-path').filter(function(){return FIPS[d3.select(this).attr('data-fips')]===name;}).classed('selected',true).style('fill','var(--accent)');
-    openStatePanel(name);
-  } catch(e){ showToast('Upload failed. Check connection.'); console.error(e); }
-  pIdx++; if(pIdx<pFiles.length)setTimeout(nextTag,300); else document.getElementById('fileInput').value='';
+
+document.getElementById('cancelBatch').addEventListener('click',()=>{
+  document.getElementById('batchModal').classList.remove('open');
+  batchFiles=[];document.getElementById('fileInput').value='';
+});
+
+document.getElementById('confirmBatch').addEventListener('click',async()=>{
+  if(!isAdmin||!batchFiles.length)return;
+  const name=bss.value;
+  document.getElementById('batchModal').classList.remove('open');
+  if(!STATE.travel[name])STATE.travel[name]={photos:[],note:''};
+
+  showToast(`⬆ Uploading ${batchFiles.length} photo${batchFiles.length>1?'s':''}…`);
+  let uploaded=0;
+  for(const file of batchFiles){
+    try{
+      const compressed=await compressImage(file,1400,0.85);
+      const safeName=name.replace(/\s+/g,'_');
+      const url=await uploadFile(compressed,`travel/${safeName}/photo_${Date.now()}_${Math.random().toString(36).slice(2,6)}.jpg`);
+      STATE.travel[name].photos.push(url);
+      uploaded++;
+      showToast(`⬆ ${uploaded}/${batchFiles.length} uploaded…`);
+    } catch(e){ console.error(e); }
+  }
+  await saveTravelState(name);
+  showToast(`✓ ${uploaded} photo${uploaded>1?'s':''} added to ${name}`);
+  d3.selectAll('path.state-path').classed('selected',false); refreshMapColors();
+  d3.selectAll('path.state-path').filter(function(){return FIPS[d3.select(this).attr('data-fips')]===name;}).classed('selected',true).style('fill','var(--accent)');
+  openStatePanel(name);
+  batchFiles=[];document.getElementById('fileInput').value='';
 });
 
 /* ================================================================
@@ -1599,7 +1826,7 @@ function openLightbox(enc){document.getElementById('lbImg').src=decodeURICompone
    CLOSE ALL
    ================================================================ */
 function closeAll(){
-  ['rModal','cardModal','pubModal','tagModal','adminModal','contactModal','lightbox'].forEach(id=>{
+  ['rModal','cardModal','pubModal','tagModal','batchModal','adminModal','contactModal','lightbox'].forEach(id=>{
     document.getElementById(id).classList.remove('open');
   });
 }
