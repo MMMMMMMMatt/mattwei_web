@@ -679,7 +679,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         <span>Upload photo</span>
       </div>
-      <img id="profileImg" src="" alt="Profile" style="display:none">
+      <img id="profileImg" src="" alt="Profile" style="display:none" onerror="this.style.display='none';document.getElementById('profileEmpty').style.display='flex'">
       <div class="photo-overlay">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <span>Change photo</span>
@@ -841,7 +841,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
     <div class="contact-links fi">
       <div class="contact-link-row">
         <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <a href="mailto:zitong0708@gmail.com">zitong0708@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#2a50435e45444d1a1d1a126a4d474b434604494547"><span class="__cf_email__" data-cfemail="43392a372c2d247374737b03242e222a2f6d202c2e">[email&#160;protected]</span></a>
       </div>
       <div class="contact-link-row">
         <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
@@ -1220,7 +1220,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1246,7 +1246,25 @@ const storage = firebase.storage();
    PASSWORD CONFIG  (password: Wzt20000708..)
    ================================================================ */
 const ADMIN_HASH = 'ea5bceb25c50eb15958214f93ed2a88822c3f3799c8784665e5743064dcc1568';
-async function hashPw(pw){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+const ADMIN_HASH_SIMPLE = 'f8e33117'; // djb2 fallback for HTTP
+
+// Pure-JS djb2 hash (works everywhere, no HTTPS needed)
+function djb2Hash(s){
+  let h=5381;
+  for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))&0xFFFFFFFF;
+  return (h>>>0).toString(16).padStart(8,'0');
+}
+
+// SHA-256 via crypto.subtle (HTTPS only), falls back to djb2
+async function hashPw(pw){
+  try{
+    if(window.crypto&&window.crypto.subtle){
+      const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+      return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  return djb2Hash(pw);
+}
 
 /* ================================================================
    TOAST / UPLOAD PROGRESS UI
@@ -1439,8 +1457,8 @@ document.getElementById('adminPwInput').addEventListener('keydown',e=>{if(e.key=
 document.getElementById('adminConfirm').onclick = async()=>{
   const pw = document.getElementById('adminPwInput').value;
   const hash = await hashPw(pw);
-  // DEV: accept any password — replace `true ||` with just the hash check when deploying
-  if(hash===ADMIN_HASH){
+  // accept SHA-256 match (HTTPS) OR djb2 match (HTTP/local)
+  if(hash===ADMIN_HASH || hash===ADMIN_HASH_SIMPLE){
     document.getElementById('adminModal').classList.remove('open');
     setAdmin(true);
   } else {
@@ -1518,8 +1536,6 @@ function initAbout(){
   renderChips('interestChips', STATE.about.interests, 'interests');
   renderChips('educationChips', STATE.about.education, 'education');
 }
-initAbout();
-
 initAbout();
 
 /* ── Recent Activity ─────────────────────────────────────── */
@@ -2707,7 +2723,6 @@ function setAdmin(val){
   _origSetAdmin(val);
   document.getElementById('contactIntro').contentEditable = val ? 'true' : 'false';
   renderTimeline(); renderBlog();
-  // update featured card admin bar
   document.querySelectorAll('.feat-admin-bar').forEach(b=>b.style.display=val?'flex':'none');
 }
 </script>
