@@ -687,6 +687,25 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
     </div>
     <input type="file" id="profileUpload" accept="image/*" style="display:none">
     <div class="contact-block fi" id="contactBlock"></div>
+    <!-- CV in left column -->
+    <div class="fi" style="width:100%;padding-top:18px">
+      <div class="bio-section-label" style="margin-bottom:10px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)">CV / Resume</div>
+      <div class="cv-btns" style="flex-direction:column;gap:7px;margin-top:0">
+        <a id="cvAcadBtn" href="#" target="_blank" class="cv-btn cv-btn-primary" style="display:none;font-size:12.5px;padding:8px 14px">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Academic CV
+        </a>
+        <a id="cvResBtn" href="#" target="_blank" class="cv-btn cv-btn-secondary" style="display:none;font-size:12.5px;padding:8px 14px">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Resume
+        </a>
+        <span id="cvNoBtns" style="font-size:12px;color:var(--text-2);font-weight:300">Not uploaded yet</span>
+      </div>
+      <div class="cv-upload-hint" onclick="document.getElementById('cvUploadInput').click()">
+        ↑ Upload / update CV (Admin only)
+      </div>
+      <input type="file" id="cvUploadInput" accept=".pdf" style="display:none" onchange="handleCvUpload(this)">
+    </div>
   </div>
   <div class="about-right">
     <h1 class="about-name fi" id="aboutName" spellcheck="false">Matt Wei</h1>
@@ -700,26 +719,12 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
       <div class="bio-section-label">Education</div>
       <div class="bio-chips" id="educationChips"></div>
     </div>
-    <!-- CV Download -->
-    <div class="fi" style="margin-top:28px">
-      <div class="bio-section-label" style="margin-bottom:12px">CV / Resume</div>
-      <div class="cv-btns">
-        <a id="cvAcadBtn" href="#" target="_blank" class="cv-btn cv-btn-primary" style="display:none">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Academic CV
-        </a>
-        <a id="cvResBtn" href="#" target="_blank" class="cv-btn cv-btn-secondary" style="display:none">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Resume
-        </a>
-        <span id="cvNoBtns" style="font-size:13px;color:var(--text-2);font-weight:300">CV not uploaded yet</span>
-      </div>
-      <div class="cv-upload-hint" onclick="document.getElementById('cvUploadInput').click()">
-        ↑ Upload / update CV files (Admin only)
-      </div>
-      <input type="file" id="cvUploadInput" accept=".pdf" style="display:none" onchange="handleCvUpload(this)">
+    <div class="bio-section fi">
+      <div class="bio-section-label">Work Experience</div>
+      <div class="bio-chips" id="workChips"></div>
     </div>
     <!-- Recent Activity -->
+    <div class="activity-section fi">
     <div class="activity-section fi">
       <div class="activity-header">
         <span class="activity-label">Recent Activity</span>
@@ -1336,6 +1341,7 @@ let STATE = Object.assign({
     photo: null,
     interests: ['Bio-inspired Robotics','Haptic Interfaces','Medical Robotics','Soft Robotics','Wearable Systems','Embedded Systems'],
     education: ['M.S.E. Mechanical Engineering · Johns Hopkins University','B.Eng. · Nanjing Institute of Technology'],
+    work: [],
     contacts: [
       {icon:'mail', label:'matt@example.com', href:'mailto:matt@example.com'},
       {icon:'github', label:'github.com/mattwei', href:'https://github.com/'},
@@ -1389,6 +1395,7 @@ async function loadFromFirestore(){
     if(doc.exists){
       const d=doc.data();
       if(d.about) STATE.about=d.about;
+      if(d.about && !d.about.work) STATE.about.work=[];  // migrate old data
       if(d.research) STATE.research=d.research;
       if(d.pubs) STATE.pubs=d.pubs;
       if(d.activity) STATE.activity=d.activity;
@@ -1499,13 +1506,16 @@ function renderChips(containerId, arr, key){
 
 function deleteChip(key, idx){
   STATE.about[key].splice(idx,1); saveState();
-  renderChips(key==='interests'?'interestChips':'educationChips', STATE.about[key], key);
+  const map={interests:'interestChips',education:'educationChips',work:'workChips'};
+  renderChips(map[key], STATE.about[key], key);
 }
 function addChip(key){
-  const val = prompt(`Add new ${key==='interests'?'interest':'education'} entry:`);
+  const labels={interests:'interest',education:'education entry',work:'work experience (e.g. "Research Assistant · JHU · 2022–2024")'};
+  const val = prompt(`Add new ${labels[key]||key}:`);
   if(val && val.trim()){
     STATE.about[key].push(val.trim()); saveState();
-    renderChips(key==='interests'?'interestChips':'educationChips', STATE.about[key], key);
+    const map={interests:'interestChips',education:'educationChips',work:'workChips'};
+    renderChips(map[key], STATE.about[key], key);
   }
 }
 
@@ -1521,6 +1531,7 @@ function initAbout(){
   renderContacts();
   renderChips('interestChips', STATE.about.interests, 'interests');
   renderChips('educationChips', STATE.about.education, 'education');
+  renderChips('workChips', STATE.about.work||[], 'work');
 }
 initAbout();
 
@@ -1599,8 +1610,13 @@ function saveContact(){
    RESEARCH CARDS
    ================================================================ */
 function renderCards(){
-  const featured = STATE.research[0] || null;
-  const others   = STATE.research.slice(1);
+  // Sort: newest year first; within same year, preserve array order (new cards unshifted to front)
+  const sorted = [...STATE.research].sort((a,b)=>{
+    const ya = parseInt(a.year)||0, yb = parseInt(b.year)||0;
+    return yb - ya;
+  });
+  const featured = sorted[0] || null;
+  const others   = sorted.slice(1);
 
   // ── Featured card ─────────────────────────────────────────
   const fc = document.getElementById('featuredCard');
@@ -2484,16 +2500,32 @@ async function handleCvUpload(input){
    ================================================================ */
 const TL_ICONS = {education:'🎓',work:'🔬',award:'🏆',publication:'📄',patent:'💡',other:'📌'};
 
+/* ── Parse date string to sortable number (newest = largest) ─ */
+function parseDateNum(str){
+  if(!str) return 0;
+  const months={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+  const s=str.toLowerCase();
+  const yearM=s.match(/(\d{4})/);
+  const monM=s.match(/^([a-z]{3})/);
+  const year=yearM?+yearM[1]:0;
+  const mon=monM?(months[monM[1]]||0):0;
+  return year*100+mon;
+}
+
 function renderTimeline(){
   const list = document.getElementById('tlList');
-  const items = STATE.timeline || [];
-  if(!items.length){
+  if(!STATE.timeline) STATE.timeline=[];
+  // sort newest first (largest date number first)
+  const sorted = [...STATE.timeline]
+    .map((item,origIdx)=>({...item,origIdx}))
+    .sort((a,b)=>parseDateNum(b.date)-parseDateNum(a.date));
+  if(!sorted.length){
     list.innerHTML=`<div style="text-align:center;padding:48px;color:var(--text-2);font-size:14px;font-weight:300">
       ${isAdmin?'Click "+ Add Event" to start building your timeline':'No timeline events yet'}
     </div>`;
     return;
   }
-  list.innerHTML = items.map((item,i)=>`
+  list.innerHTML = sorted.map((item)=>`
     <div class="tl-item">
       <div class="tl-card">
         <div class="tl-date">${item.date}</div>
@@ -2502,10 +2534,10 @@ function renderTimeline(){
         ${item.desc?`<div class="tl-desc">${item.desc}</div>`:''}
         <span class="tl-tag">${TL_ICONS[item.type]||'📌'} ${item.type}</span>
         <div class="tl-admin">
-          <button class="tl-icon-btn" onclick="openTlModal(${i})" title="Edit">
+          <button class="tl-icon-btn" onclick="openTlModal(${item.origIdx})" title="Edit">
             <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="tl-icon-btn del" onclick="deleteTlItem(${i})" title="Delete">
+          <button class="tl-icon-btn del" onclick="deleteTlItem(${item.origIdx})" title="Delete">
             <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
@@ -2542,7 +2574,7 @@ function saveTlItem(){
   if(editIdx!==''){
     STATE.timeline[+editIdx]=item;
   } else {
-    STATE.timeline.unshift(item); // newest first
+    STATE.timeline.push(item); // sorting handles display order
   }
   saveState(); renderTimeline(); closeTlModal();
 }
