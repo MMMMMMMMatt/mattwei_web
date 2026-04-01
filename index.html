@@ -1245,26 +1245,11 @@ const storage = firebase.storage();
 /* ================================================================
    PASSWORD CONFIG  (password: Wzt20000708..)
    ================================================================ */
-const ADMIN_HASH = 'ea5bceb25c50eb15958214f93ed2a88822c3f3799c8784665e5743064dcc1568';
-const ADMIN_HASH_SIMPLE = 'f8e33117'; // djb2 fallback for HTTP
-
-// Pure-JS djb2 hash (works everywhere, no HTTPS needed)
-function djb2Hash(s){
-  let h=5381;
-  for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))&0xFFFFFFFF;
-  return (h>>>0).toString(16).padStart(8,'0');
-}
-
-// SHA-256 via crypto.subtle (HTTPS only), falls back to djb2
-async function hashPw(pw){
-  try{
-    if(window.crypto&&window.crypto.subtle){
-      const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
-      return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
-    }
-  }catch(e){}
-  return djb2Hash(pw);
-}
+/* ================================================================
+   PASSWORD — direct comparison (works on HTTP, HTTPS, local file)
+   ================================================================ */
+// To change password: just edit the string below directly
+const ADMIN_PASSWORD = 'Wzt20000708..';
 
 /* ================================================================
    TOAST / UPLOAD PROGRESS UI
@@ -1431,10 +1416,13 @@ let isAdmin = false;
 function setAdmin(val){
   isAdmin = val;
   document.body.classList.toggle('admin-mode', val);
-  // toggle contenteditable
   ['aboutName','aboutRole','aboutBio'].forEach(id=>{
     document.getElementById(id).contentEditable = val ? 'true' : 'false';
   });
+  const ci = document.getElementById('contactIntro');
+  if(ci) ci.contentEditable = val ? 'true' : 'false';
+  renderTimeline(); renderBlog();
+  document.querySelectorAll('.feat-admin-bar').forEach(b=>b.style.display=val?'flex':'none');
 }
 
 // Ctrl/Cmd + Shift + A
@@ -1454,11 +1442,9 @@ function openAdminModal(){
 }
 document.getElementById('adminCancel').onclick=()=>document.getElementById('adminModal').classList.remove('open');
 document.getElementById('adminPwInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('adminConfirm').click();});
-document.getElementById('adminConfirm').onclick = async()=>{
+document.getElementById('adminConfirm').onclick = ()=>{
   const pw = document.getElementById('adminPwInput').value;
-  const hash = await hashPw(pw);
-  // accept SHA-256 match (HTTPS) OR djb2 match (HTTP/local)
-  if(hash===ADMIN_HASH || hash===ADMIN_HASH_SIMPLE){
+  if(pw === ADMIN_PASSWORD){
     document.getElementById('adminModal').classList.remove('open');
     setAdmin(true);
   } else {
@@ -2717,14 +2703,7 @@ async function handleContactSubmit(e){
 /* ================================================================
    UPDATE closeAll, loadFromFirestore, saveState, setAdmin for new sections
    ================================================================ */
-// patch setAdmin to also handle contact intro + timeline/blog re-render
-const _origSetAdmin = setAdmin;
-function setAdmin(val){
-  _origSetAdmin(val);
-  document.getElementById('contactIntro').contentEditable = val ? 'true' : 'false';
-  renderTimeline(); renderBlog();
-  document.querySelectorAll('.feat-admin-bar').forEach(b=>b.style.display=val?'flex':'none');
-}
+// setAdmin is already fully defined above with all features merged in
 </script>
 </body>
 </html>
